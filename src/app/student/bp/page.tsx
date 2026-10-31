@@ -128,7 +128,7 @@ export default function BPEditorPage() {
         <span className={gate.nodes >= 5 ? "text-emerald-600" : "text-neutral-500"}>
           承重节点 {gate.nodes}/5 {gate.nodes >= 5 ? "✓" : ""}
         </span>
-        <span className="text-neutral-400">|</span>
+        <span className="text-neutral-500">|</span>
         <span className={gate.sim >= 4 ? "text-emerald-600" : "text-neutral-500"}>
           跑机回合 {gate.sim}/4 {gate.sim >= 4 ? "✓" : ""}
         </span>

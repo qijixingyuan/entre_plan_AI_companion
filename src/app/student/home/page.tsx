@@ -158,7 +158,7 @@ export default function StudentHome() {
                   style={{ width: `${Math.min(100, (step.done / step.total) * 100)}%` }}
                 />
               </div>
-              <span className="text-neutral-400 group-hover:text-blue-600 transition">→</span>
+              <span className="text-neutral-500 group-hover:text-blue-600 transition">→</span>
             </div>
           </Link>
         ))}

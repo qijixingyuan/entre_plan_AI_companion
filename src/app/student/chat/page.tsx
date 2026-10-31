@@ -199,7 +199,7 @@ export default function ChatPage() {
               >
                 {n.unlocked ? "✓" : "○"} {n.label}
               </span>
-              {i < nodes.length - 1 && <span className="mx-1 text-neutral-400">·</span>}
+              {i < nodes.length - 1 && <span className="mx-1 text-neutral-500">·</span>}
             </span>
           ))}
           {allDone && (
@@ -226,7 +226,7 @@ export default function ChatPage() {
             <Link href="/student/archives" className="text-blue-600 hover:underline">
               提示词生成、交互存档 →
             </Link>
-            <span className="text-neutral-400">|</span>
+            <span className="text-neutral-500">|</span>
             <span>存档后可复制提示词到豆包/DeepSeek 生成完整 BP</span>
           </div>
         )}
