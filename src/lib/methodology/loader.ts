@@ -211,3 +211,132 @@ export async function buildMethodologyInjection(opts: MethodologyInjectOpts): Pr
     .join("\n");
   return `# 5 节点合格判据总览\n${overview}\n\n${TOTAL_DISCIPLINE}`;
 }
+
+// ---------- 对外：结构化节点（供教师端量规页同源读取） ----------
+// 教师端「量规配置」页直接读这一份，与 AI 守门人读的是同一个判据表.md，
+// 保证「老师教的 / AI 拦的 / 量规评的」三套标准同源。
+export interface MethodologyNode {
+  seq: number;
+  key: string;
+  label: string;
+  /** 节点与精益画布 / 国创赛维度的对应关系（md 里的「**对应**：」行） */
+  correspond: string;
+  /** 合格判据（已含粗体关键词，md 原样） */
+  pass: string[];
+  /** 不合格反例（已去编号，保留 ❌ 由前端渲染） */
+  fail: string[];
+  /** 出处行数组 */
+  source: string[];
+}
+
+const NODE_ORDER: DecisionNodeKey[] = [
+  "customer",
+  "value_prop",
+  "revenue",
+  "metric",
+  "moat",
+];
+
+/** 解析单个节点段为结构化对象；任一字段缺失时回退 FALLBACK_NODES 对应项 */
+function parseNodeSegment(seg: string, fallbackKey: DecisionNodeKey, idx: number): MethodologyNode {
+  let seq = idx + 1;
+  let key = fallbackKey;
+  let label = FALLBACK_NODES[fallbackKey].label;
+  let correspond = "";
+  const pass: string[] = [];
+  const fail: string[] = [];
+  const source: string[] = [];
+
+  const lines = seg.split(/\r?\n/);
+  const head = lines[0]?.match(/^##\s+节点\s+(\d+)\s+·\s+`([a-z_]+)`\s*(.+)?$/);
+  if (head) {
+    seq = Number(head[1]);
+    key = head[2] as DecisionNodeKey;
+    label = head[3]?.trim() || label;
+  }
+
+  type Section = "none" | "pass" | "fail" | "source";
+  let section: Section = "none";
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^###\s+合格判据/.test(line)) {
+      section = "pass";
+      continue;
+    }
+    if (/^###\s+不合格反例/.test(line)) {
+      section = "fail";
+      continue;
+    }
+    if (/^###\s+出处/.test(line)) {
+      section = "source";
+      continue;
+    }
+    if (/^#{1,3}\s/.test(line)) {
+      section = "none";
+      continue;
+    }
+
+    const corr = line.match(/^\*\*对应\*\*[:：]\s*(.+)$/);
+    if (corr && section === "none") {
+      correspond = corr[1].trim();
+      continue;
+    }
+
+    if (section === "pass") {
+      const pm = line.match(/^\d+\.\s+\*\*(.+?)\*\*[:：]?\s*(.*)$/);
+      if (pm) {
+        pass.push(pm[2] ? `**${pm[1]}**：${pm[2]}` : `**${pm[1]}**`);
+        continue;
+      }
+      const pm2 = line.match(/^\d+\.\s+(.+)$/);
+      if (pm2) {
+        pass.push(pm2[1].trim());
+        continue;
+      }
+    } else if (section === "fail") {
+      const fm = line.match(/^\d+\.\s+❌\s+(.+)$/);
+      if (fm) {
+        fail.push(fm[1].trim());
+        continue;
+      }
+    } else if (section === "source") {
+      const sm = line.match(/^\s*[-*]\s+(.+)$/);
+      if (sm) {
+        source.push(sm[1].trim());
+        continue;
+      }
+    }
+  }
+
+  // 兜底补缺：某段解析为空时退回内置常量，避免前端出现空白区
+  if (pass.length === 0) pass.push(...FALLBACK_NODES[fallbackKey].pass);
+  if (fail.length === 0) fail.push(...FALLBACK_NODES[fallbackKey].fail);
+  if (source.length === 0) source.push(FALLBACK_NODES[fallbackKey].source);
+
+  return { seq, key, label, correspond, pass, fail, source };
+}
+
+/**
+ * 返回 5 节点结构化判据，供教师端「量规配置」页渲染。
+ * 读不到判据表.md 时整张表回退到内置 FALLBACK_NODES，保证页面不空。
+ */
+export async function getMethodologyNodes(): Promise<MethodologyNode[]> {
+  const md = await readMd(CRITERIA_FILE);
+  if (!md) {
+    return NODE_ORDER.map((k, i) => {
+      const f = FALLBACK_NODES[k];
+      return {
+        seq: i + 1,
+        key: k,
+        label: f.label,
+        correspond: "",
+        pass: [...f.pass],
+        fail: [...f.fail],
+        source: [f.source],
+      };
+    });
+  }
+  const map = splitCriteriaByNode(md);
+  return NODE_ORDER.map((k, i) => parseNodeSegment(map[k] || "", k, i));
+}
