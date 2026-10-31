@@ -775,10 +775,11 @@
     <table>
       <thead><tr><th style="width:170px">资产</th><th>内容 / 落点</th><th style="width:280px">出处依据</th></tr></thead>
       <tbody>
-        <tr><td>判据表.md</td><td>5 节点「合格判据 / 不合格反例 / 出处」，每节点 3 条反例骨架；守门人按<strong>当前节点</strong>动态注入，命中反例时点名第几条</td><td>精益画布 Maurya 2010；VPC Osterwalder 2014；国创赛 2025 职教赛道</td></tr>
+        <tr><td>判据表.md</td><td>5 节点「合格判据 / 不合格反例 / 出处」，每节点 5 条反例；守门人按<strong>当前节点</strong>动态注入，命中反例时点名第几条（①②③④⑤）</td><td>精益画布 Maurya 2010；VPC Osterwalder 2014；国创赛 2025 职教赛道</td></tr>
         <tr><td>单位经济模型.md</td><td>客单价 × 频次 × 留存 → 毛利 → 减固定成本 → 盈亏平衡点；跑机 4 回合可真结算；含长沙体育新城示例</td><td>国创赛 2025 职教赛道：盈亏平衡点为财务必查项；管理会计边际贡献算法</td></tr>
         <tr><td>README.md</td><td>框架选型（<strong>精益画布</strong>为底线本、BMC 保留设计）、9 块↔5 节点映射、已知弱点</td><td>BMC = Osterwalder 2010；精益画布 = Maurya 2010</td></tr>
         <tr><td>loader.ts</td><td>运行时读取判据表/单位经济模型，按节点切分注入；带 mtime 缓存（改 .md 即生效）+ 内置兜底（文件缺失也不崩）</td><td>代码层，<code>src/lib/methodology/loader.ts</code></td></tr>
+        <tr><td>guards.ts（硬闸门）</td><td>顺序闸门 <code>checkSequenceGate</code>：只许放行「当前待推进节点」，越级解锁直接拦截；原话引用闸门 <code>checkCustomerEvidenceGate</code>：customer 放行前证据须含 ≥3 处引号包裹的访谈原话，不足自动打回</td><td>VPC「先客户档案后价值地图」顺序；判据表节点 1「痛点可查 ≥3 条原话引用」</td></tr>
       </tbody>
     </table>
 
@@ -795,8 +796,11 @@
       ⚠️ 该大纲<b>并未点名</b>画布或精益创业 ——「教育部规定要教商业模式画布」是误传。真实结构是<b>大纲定边界 + 教材与一流课程给工具</b>两层。
     </div>
 
+    <div class="callout" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
+      <strong style="color:var(--ok)">本轮回合已落地（2026-10-31）：</strong>反例库已扩至每节点 5 条（共 25 条，守门人打回可引用①②③④⑤）；<b>VPC 顺序硬闸门已落地</b>于 <code>src/lib/guards.ts</code>（<code>checkSequenceGate</code> 顺序闸门 + <code>checkCustomerEvidenceGate</code> 原话引用闸门，阈值 <code>CUSTOMER_QUOTE_THRESHOLD=3</code>，老师改该常量即可调门槛）。
+    </div>
     <div class="callout">
-      <strong>仍为骨架（待教师 / 专家拍板）：</strong>反例库待扩到每节点 ≥5 条；VPC「先客户档案后价值地图」顺序硬闸门待落地；【待校准】处的取证原话阈值、壁垒举证标准、长沙示例具体数字需教师按本地实情定。
+      <strong>仍为骨架（待教师 / 专家拍板）：</strong>【待校准】处的取证原话阈值、壁垒举证标准、长沙示例具体数字需教师按本地实情定；单位经济模型真结算接入 sim/decide 引擎为下一步。
     </div>
   </section>
 

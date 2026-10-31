@@ -4,6 +4,7 @@ import { db, schema } from "@/db";
 import { eq, and } from "drizzle-orm";
 import { DEMO_DOC_ID } from "@/lib/session";
 import { loadContext, DECISION_NODES, type DecisionNodeKey } from "@/lib/context";
+import { checkSequenceGate, checkCustomerEvidenceGate } from "@/lib/guards";
 
 /** 只接受 5 个法定节点，防止模型输出脏 key 污染数据库 */
 function asNodeKey(v: string | undefined): DecisionNodeKey | null {
@@ -74,6 +75,37 @@ export async function POST(req: NextRequest) {
   const raw = await callLLM(history, currentNode?.key ?? null);
   const { body: replyBody, tag } = parseAITag(raw);
 
+  // ===== 承重节点顺序硬闸门（VPC：先客户档案，后价值地图）=====
+  // 两道阀门均为确定性校验，不依赖 LLM 是否自觉：
+  //  1) 顺序闸门：只许放行「当前待推进节点」，越级直接拦截
+  //  2) 原话引用闸门：customer 放行前证据须含 ≥阈值 条现场访谈原话
+  const unlockKey = tag?.verdict === "pass" ? asNodeKey(tag.unlock) : null;
+
+  let effectiveUnlock: DecisionNodeKey | null = unlockKey;
+  let gateNote: string | null = null;
+
+  const seq = checkSequenceGate(unlockKey, currentNode?.key ?? null);
+  if (!seq.allowed) {
+    effectiveUnlock = null;
+    gateNote = seq.detail ?? "顺序闸门：只能逐级放行，不能跳节点。";
+  } else if (effectiveUnlock === "customer") {
+    const custText = [
+      ...ctx.aiMessages.filter((m) => m.role === "user").map((m) => m.content),
+      studentText,
+    ].join("\n");
+    const ev = checkCustomerEvidenceGate(custText);
+    if (!ev.passed) {
+      effectiveUnlock = null;
+      gateNote = ev.detail ?? "原话引用不足，customer 暂不解锁。";
+    }
+  }
+
+  // 闸门拦截时，用系统硬闸门结论覆盖 AI 的「通过」判定（对话记录须真实）
+  const finalTag = gateNote && tag ? { ...tag, verdict: "reject" as const } : tag;
+  const assistantRaw = gateNote ? `[[TYPE=evidence|VERDICT=reject]]\n${gateNote}` : raw;
+  const replyForUser = gateNote ? gateNote : replyBody;
+  // ============================================================
+
   const turnId = Date.now();
   const now = new Date().toISOString();
   await db.insert(schema.aiMessages).values([
@@ -91,15 +123,14 @@ export async function POST(req: NextRequest) {
       docId: DEMO_DOC_ID,
       turnId,
       role: "assistant",
-      content: raw,
+      content: assistantRaw,
       mode: "gatekeeper",
       createdAt: now,
     },
   ]);
 
-  // 证据成立 → 放行该承重节点（学生的话本身就是证据来源）
-  const unlockKey = tag?.verdict === "pass" ? asNodeKey(tag.unlock) : null;
-  if (unlockKey) {
+  // 证据成立且过闸 → 放行该承重节点（学生的话本身就是证据来源）
+  if (effectiveUnlock) {
     const commit = (tag?.commit || studentText).slice(0, 200);
     const existing = await db
       .select()
@@ -107,7 +138,7 @@ export async function POST(req: NextRequest) {
       .where(
         and(
           eq(schema.loadBearingDecisions.docId, DEMO_DOC_ID),
-          eq(schema.loadBearingDecisions.node, unlockKey)
+          eq(schema.loadBearingDecisions.node, effectiveUnlock)
         )
       )
       .limit(1);
@@ -124,9 +155,9 @@ export async function POST(req: NextRequest) {
         .where(eq(schema.loadBearingDecisions.id, existing[0].id));
     } else {
       await db.insert(schema.loadBearingDecisions).values({
-        id: `lbd-${turnId}-${unlockKey}`,
+        id: `lbd-${turnId}-${effectiveUnlock}`,
         docId: DEMO_DOC_ID,
-        node: unlockKey,
+        node: effectiveUnlock,
         commitment: commit,
         evidence: studentText.slice(0, 500),
         confidence: 3,
@@ -144,11 +175,12 @@ export async function POST(req: NextRequest) {
       assistantMessage: {
         id: `msg-a-${turnId}`,
         role: "assistant",
-        content: replyBody,
-        tag,
+        content: replyForUser,
+        tag: finalTag,
         createdAt: now,
       },
-      unlocked: unlockKey,
+      unlocked: effectiveUnlock,
+      gateNote,
       nodes: nodesView(after),
       unlockedCount: after.decisionsFilled,
       allUnlocked: after.decisionsComplete,

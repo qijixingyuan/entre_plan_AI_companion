@@ -81,3 +81,81 @@ export const CUSTOM_STRATEGY_BONUS = 1.2;
 export function shouldTeacherReview(): boolean {
   return Math.random() < TEACHER_REVIEW_SAMPLE_RATE;
 }
+
+// ---------- 承重节点顺序硬闸门（VPC：先客户档案，后价值地图）----------
+
+/**
+ * customer 节点放行所需的「原话引用」最低条数。
+ * 【待校准·教师可调】只改这一个数字即可调整门槛，无需动逻辑。
+ * 对应判据表节点 1「痛点可查：至少 3 条来自真实访谈/观察的原话引用」。
+ */
+export const CUSTOMER_QUOTE_THRESHOLD = 3;
+
+/** 统计文本中「被引号包裹的原话」段数（支持「」『』“”""''） */
+export function countVerbatimQuotes(text: string): number {
+  const pairs: [string, string][] = [
+    ["“", "”"],
+    ["「", "」"],
+    ["『", "』"],
+    ['"', '"'],
+    ["'", "'"],
+  ];
+  let count = 0;
+  for (const [open, close] of pairs) {
+    const re = new RegExp(
+      escapeForRegExp(open) + "([^" + escapeForRegExp(close) + "]*?)" + escapeForRegExp(close),
+      "g"
+    );
+    const m = text.match(re);
+    if (m) count += m.length;
+  }
+  return count;
+}
+
+function escapeForRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * 客户档案硬闸门：customer 放行前，证据中必须含 ≥ CUSTOMER_QUOTE_THRESHOLD 处原话引用
+ * （现场访谈的一手原话，用「」/" " 等引号包裹）。不足则系统自动打回。
+ * 与「顺序闸门」配合，实现 VPC「先画客户画像、再谈价值地图」的硬性顺序。
+ */
+export function checkCustomerEvidenceGate(customerStageText: string): {
+  passed: boolean;
+  count: number;
+  threshold: number;
+  detail?: string;
+} {
+  const count = countVerbatimQuotes(customerStageText);
+  if (count < CUSTOMER_QUOTE_THRESHOLD) {
+    return {
+      passed: false,
+      count,
+      threshold: CUSTOMER_QUOTE_THRESHOLD,
+      detail:
+        `系统硬性闸门：customer 放行需证据中至少含 ${CUSTOMER_QUOTE_THRESHOLD} 处原话引用` +
+        `（用「」/" " 包裹的真实访谈原话），当前仅 ${count} 处。` +
+        `请继续去现场访谈，把家长/学员的一手原话带回来，再申请放行。`,
+    };
+  }
+  return { passed: true, count, threshold: CUSTOMER_QUOTE_THRESHOLD };
+}
+
+/**
+ * 顺序闸门：只允许放行「当前待推进节点」（第一个尚未放行的节点）。
+ * 防止 AI 越级解锁后续节点（例如 customer 还没存库就放 value_prop）。
+ */
+export function checkSequenceGate(
+  unlockKey: string | null,
+  currentNodeKey: string | null
+): { allowed: boolean; detail?: string } {
+  if (!unlockKey) return { allowed: true };
+  if (unlockKey !== currentNodeKey) {
+    return {
+      allowed: false,
+      detail: `顺序闸门：只能逐级放行，当前应推进的是「${currentNodeKey}」，不能跳到「${unlockKey}」。`,
+    };
+  }
+  return { allowed: true };
+}
