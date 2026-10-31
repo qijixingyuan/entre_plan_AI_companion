@@ -62,3 +62,6 @@ next-env.d.ts
 
 # 中间产物：DOCX 转换会丢 thead 底纹（白底白字），勿分发。只保留 PDF
 docs/*.docx
+
+# playwright-cli 会话临时目录
+/.playwright-cli/
