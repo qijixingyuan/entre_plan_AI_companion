@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>创业计划书 AI 协作 Harness · 使用手册 v3</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 16mm 18mm 16mm;
+    @top-center {
+      content: "创业计划书 AI 协作 Harness · 使用手册 v3";
+      font-family: "Microsoft YaHei", sans-serif; font-size: 8pt; color: #94a3b8;
+    }
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+      font-family: "Microsoft YaHei", sans-serif; font-size: 8.5pt; color: #94a3b8;
+    }
+    @bottom-left {
+      content: "湖南体育职业学院 · 大学生创业计划书课程";
+      font-family: "Microsoft YaHei", sans-serif; font-size: 8pt; color: #cbd5e1;
+    }
+  }
+  @page :first { margin: 0; @top-center { content: none; } @bottom-right { content: none; } @bottom-left { content: none; } }
+
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "微软雅黑", "PingFang SC", "Segoe UI Symbol", "Apple Symbols", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.72;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  /* 箭头类符号单独指定符号字体，避免缺字形显示成方块 */
+  .arw { font-family: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif; }
+
+  /* ---- 封面 ---- */
+  .cover {
+    height: 297mm; width: 210mm; position: relative;
+    padding: 58mm 24mm 0 24mm;
+    box-sizing: border-box;
+    page-break-after: always; break-after: page;
+    background: linear-gradient(160deg, #0f2f5f 0%, #1e4a8f 55%, #2563eb 100%);
+    color: #fff; overflow: hidden;
+  }
+  .cover::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 46mm;
+    background: linear-gradient(to top, rgba(0,0,0,0.28), transparent);
+  }
+  .cover .kicker {
+    font-size: 11pt; letter-spacing: 4px; color: #93c5fd; margin-bottom: 12mm;
+    font-weight: 500;
+  }
+  .cover h1 {
+    font-size: 32pt; line-height: 1.3; margin: 0 0 7mm; border: none;
+    padding: 0; color: #fff; letter-spacing: 0; font-weight: 700;
+  }
+  .cover .sub {
+    font-size: 14pt; color: #dbeafe; font-weight: 300; margin-bottom: 14mm;
+    line-height: 1.5;
+  }
+  .cover .rule { width: 34mm; height: 3px; background: #60a5fa; margin-bottom: 12mm; }
+  .cover .desc {
+    font-size: 10.5pt; color: #bfdbfe; line-height: 1.95; max-width: 130mm;
+  }
+  .cover .meta {
+    position: absolute; left: 24mm; bottom: 16mm; font-size: 9.5pt;
+    color: #93c5fd; line-height: 1.9; z-index: 1;
+  }
+  .cover .meta b { color: #fff; font-weight: 600; }
+
+  h1 {
+    font-size: 22pt; color: #0f2f5f; border-bottom: 3px solid #0f2f5f;
+    padding-bottom: 9px; margin: 0 0 14px; letter-spacing: -0.3px;
+  }
+  h2 {
+    font-size: 15pt; color: #0f2f5f; margin: 26px 0 10px;
+    padding-left: 11px; border-left: 5px solid #2563eb; line-height: 1.35;
+    break-after: avoid;
+  }
+  h3 {
+    font-size: 12.5pt; color: #1e3a8a; margin: 18px 0 8px;
+    padding-bottom: 4px; border-bottom: 1px solid #dbe3ef; break-after: avoid;
+  }
+  h4 { font-size: 11pt; color: #334155; margin: 14px 0 6px; break-after: avoid; }
+  p { margin: 7px 0; text-align: justify; }
+  ul, ol { margin: 7px 0 7px 0; padding-left: 22px; }
+  li { margin: 3.5px 0; }
+  li.sub { margin-left: 16px; list-style-type: circle; color: #475569; }
+  strong { color: #0f2f5f; }
+  em { color: #475569; }
+  code {
+    font-family: Consolas, "Courier New", monospace; font-size: 9pt;
+    background: #f1f5f9; color: #b91c1c; padding: 1.5px 5px;
+    border-radius: 3px; border: 1px solid #e2e8f0;
+  }
+  pre {
+    background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #2563eb;
+    border-radius: 5px; padding: 11px 13px; overflow-x: hidden;
+    break-inside: avoid; margin: 11px 0;
+  }
+  pre code {
+    background: none; border: none; padding: 0; color: #1e293b;
+    font-size: 8.8pt; line-height: 1.55; white-space: pre-wrap;
+    word-break: break-all;
+  }
+  /* 流程图箭头：独立成行、居中、放大 */
+  .flowarrow {
+    font-family: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif;
+    text-align: center; font-size: 15pt; color: #2563eb;
+    line-height: 1.1; margin: 5px 0; -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  table {
+    width: 100%; border-collapse: collapse; margin: 11px 0 13px;
+    font-size: 9.3pt; break-inside: avoid;
+  }
+  thead { background: #0f2f5f; }
+  th {
+    color: #fff; font-weight: 600; padding: 7px 8px; text-align: left;
+    border: 1px solid #0f2f5f; line-height: 1.4;
+  }
+  td {
+    padding: 6px 8px; border: 1px solid #cbd5e1; vertical-align: top;
+    line-height: 1.55;
+  }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr { break-inside: avoid; }
+  blockquote {
+    margin: 11px 0; padding: 10px 14px; background: #fffbeb;
+    border-left: 4px solid #f59e0b; color: #78350f; font-size: 10pt;
+    break-inside: avoid;
+  }
+  blockquote p { margin: 3px 0; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+  figure { margin: 14px 0 16px; break-inside: avoid; text-align: center; }
+  figure img {
+    width: 100%; max-width: 152mm; height: auto;
+    border: 1px solid #cbd5e1; border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.09);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  figcaption {
+    font-size: 8.8pt; color: #64748b; margin-top: 6px;
+    text-align: center; line-height: 1.5;
+  }
+  a { color: #2563eb; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="kicker">大 学 生 创 业 计 划 书 课 程</div>
+  <h1>创业计划书<br/>AI 协作 Harness</h1>
+  <div class="rule"></div>
+  <div class="sub">使用手册 v3</div>
+  <div class="desc">
+    一个限定工作区：学生与 AI 在这里协作写创业计划书，所有关键动作都留痕。<br/>
+    AI 不给答案，它派学生出去取证；学生拿回真实信息，它才放行。<br/>
+    评分看「你做了什么判断」，不看「AI 写得多漂亮」。
+  </div>
+  <div class="meta">
+    <b>湖南体育职业学院</b><br/>
+    线上地址　http://47.107.31.231:3005/<br/>
+    手册版本　v3 · 2026 年 10 月 30 日
+  </div>
+</div>
+<blockquote>v3（2026-10-30）新增：<strong>提示词生成、交互存档</strong> —— 每次 AI 学伴交互可存为新版本，得到一份可迁移提示词（扔到豆包/DeepSeek 从零生成完整 BP）与一份交互全过程文档，均可下载；教师端可查看全体学生的全部存档。 v2（2026-10-30）相对 v1 的核心变化：<strong>AI 从"答案机"改成"守门人"</strong>，承重决策卡独立页面被取消、并入 AI 学伴对话。 v1 / v2 手册保留在 <code>使用手册_v1_20261030.md</code> / <code>使用手册_v2_20261030.md</code>，勿覆盖。</blockquote>
+<hr />
+<h2 id="h8">一、这个系统是什么</h2>
+<p>一个限定工作区。学生在这里与 AI 协作写创业计划书，但<strong>AI 不给答案</strong>——它给方法论、派取证任务，学生必须把从外部拿到的真实信息带回来，AI 验证后才放行。</p>
+<p><strong>课堂场景设定（本系统全部演示与引导文案的背景）</strong>： 湖南体育职业学院学生创业，项目落在<strong>长沙市雨花区体育新城</strong>一带，业态为青少年体育培训 / 场馆时段运营 / 赛事与团建承接。事件库的 20 条冲击全部基于这一地域情境（梅雨季、中考体育政策、公办场馆分流、教练挖角等）。</p>
+<p><strong>要解决的真问题</strong>：学生把写作任务直接扔给豆包/免费 AI，得到一份通顺但空洞的计划书，什么也没学到。本系统让"拿到答案"的路径失效——AI 会拒绝直接回答，反而给他一个必须出门去做的任务。</p>
+<h3 id="h17">一句话流程</h3>
+<figure><img src="images/01-chat.png" alt="图 1 · AI 学伴界面：顶部为 5 个承重节点进度，AI 每条回复带判定徽章（图中可见「证据不足，打回」与「方法论」两种）" /><figcaption>图 1 · AI 学伴界面：顶部为 5 个承重节点进度，AI 每条回复带判定徽章（图中可见「证据不足，打回」与「方法论」两种）</figcaption></figure>
+<pre><code>和 AI 学伴对话 → 它派你去取证
+<div class="flowarrow">↓</div>
+你出去访谈/查数据，把原话带回来
+<div class="flowarrow">↓</div>
+AI 判定：证据成立 → 放行 1 个承重节点；不成立 → 打回，再派一次任务
+<div class="flowarrow">↓</div>
+5 个节点全走通 + 4 个月度跑机回合全跑完
+<div class="flowarrow">↓</div>
+一键「汇总生成完整 BP」→ 末尾附「模拟投资人追问」</code></pre>
+<hr />
+<h2 id="h33">二、快速开始</h2>
+<h3 id="h35">2.1 学生：直接进入对话</h3>
+<p>打开 <code>/student/chat</code>，页面会直接显示 AI 学伴的开场（不需要先填任何表单）。点下方任意一个快捷句即可开口，也可以直接打字。</p>
+<p><strong>第一次可能会碰壁</strong>——问"我的客户应该是谁"，AI 会拒绝直接回答，而是给你一个具体到当天的任务（去哪、拦几个人、问哪三句）。这是设计如此，不是系统坏了。</p>
+<h3 id="h41">2.2 教师：先看三处</h3>
+<figure><img src="images/07-home.png" alt="图 2 · 学生学习主页：各模块完成度一览" /><figcaption>图 2 · 学生学习主页：各模块完成度一览</figcaption></figure>
+<table>
+<thead><tr><th>页面</th><th>看什么</th></tr></thead>
+<tbody>
+<tr><td><code>/teacher/dashboard</code></td><td>承重节点进度、跑机回合、闸门告警；右上角「↺ 重置学生数据」</td></tr>
+<tr><td><code>/teacher/events</code></td><td>20 条长沙情境事件，可按本学期时事增删改</td></tr>
+<tr><td><code>/student/records</code></td><td>以任意学生身份进入，看完成度检查表缺哪几项</td></tr>
+</tbody></table>
+<hr />
+<h2 id="h51">三、首次进入的 7 步引导（界面已内置）</h2>
+<p>首次打开任意页面会自动弹出，看完自动记住；学生主页有「🎓 新手引导」可重看。</p>
+<table>
+<thead><tr><th>步</th><th>讲什么</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>系统定位：AI 不给答案，分打给你做了什么判断</td></tr>
+<tr><td>2</td><td>AI 学伴（守门人）与 5 个承重节点</td></tr>
+<tr><td>3</td><td>BP 跑机 4 回合</td></tr>
+<tr><td>4</td><td>5 点启动金券商店</td></tr>
+<tr><td>5</td><td>记录卡与完成度检查表</td></tr>
+<tr><td>6</td><td>提示词生成、交互存档：提示词可带走 + 交互文档</td></tr>
+<tr><td>7</td><td>BP 文档汇总生成 + 教师端</td></tr>
+</tbody></table>
+<hr />
+<h2 id="h67">四、学生端模块详解</h2>
+<h3 id="h69">4.1 AI 学伴 <code>/student/chat</code>（主入口，先来这里）</h3>
+<p><strong>页面结构</strong></p>
+<ul>
+<li><strong>顶部一行</strong>：5 个承重节点的进度（目标客户 · 价值主张 · 收入模式 · 关键指标 · 竞争壁垒），走通一个亮一个。全部走通后右侧出现「5 项已走通 → 去汇总 BP」。</li>
+<li><strong>对话区</strong>：AI 每条回复带一枚判定徽章，四种状态：</li>
+</ul>
+<table>
+<thead><tr><th>徽章</th><th>含义</th></tr></thead>
+<tbody>
+<tr><td>✓ 证据成立</td><td>你带回来的东西被认可，对应节点放行</td></tr>
+<tr><td>✗ 证据不足 · 打回</td><td>证据不够或逻辑跳步，AI 会再派一次更具体的任务</td></tr>
+<tr><td>→ 已派任务，去取证</td><td>你空手来问，AI 不回答，只派任务</td></tr>
+<tr><td>方法论</td><td>你问的是方法，AI 直接讲</td></tr>
+</tbody></table>
+<ul>
+<li><strong>每条 AI 回复下方</strong>：1–5 分评价按钮。点完自动写入记录卡。</li>
+<li><strong>右侧「清空」</strong>：清空对话（已放行的节点会保留）。</li>
+</ul>
+<p><strong>AI 的判定标记（教师若要核对，看这里）</strong> AI 回复在数据库里的原文以 <code>[[TYPE=...|VERDICT=...|UNLOCK=...|COMMIT=...]]</code> 开头，服务端据此决定是否放行节点。前端已剥离该标记，学生看不到。</p>
+<h3 id="h89">4.2 BP 跑机 <code>/student/sim</code></h3>
+<figure><img src="images/03-sim.png" alt="图 3 · BP 跑机：页面顶部显示「本轮受检验的承诺」，即学生自己挣到的承重节点" /><figcaption>图 3 · BP 跑机：页面顶部显示「本轮受检验的承诺」，即学生自己挣到的承重节点</figcaption></figure>
+<ul>
+<li>4 个回合 = 4 个月，每回合一次冲击。<strong>重置后系统按类别铺开投放</strong>：天气 → 政策 → 市场 → 经营，保证 4 次冲击打在不同地方。</li>
+<li>页面顶部显示「本轮受检验的承诺」——就是你在 AI 学伴挣到的 5 个节点。被冲击的是你自己的承诺，不是预设的假数据。</li>
+<li>每回合限时 120 秒，三选一或自提策略（自提评分 ×1.2）。<strong>必须写理由</strong>，期末口试会追问。</li>
+<li>4 个回合全部跑完 → 页面底部出现绿色出口：「⚡ 去 BP 文档汇总生成完整计划书」。</li>
+</ul>
+<h3 id="h96">4.3 BP 文档 <code>/student/bp</code></h3>
+<figure><img src="images/04-bp.png" alt="图 4 · BP 文档页的门禁状态条：承重节点 1/5、跑机回合 0/4，未达标时汇总按钮不可用" /><figcaption>图 4 · BP 文档页的门禁状态条：承重节点 1/5、跑机回合 0/4，未达标时汇总按钮不可用</figcaption></figure>
+<p>顶部有一条门禁状态条，实时显示 <code>承重节点 x/5</code> 与 <code>跑机回合 x/4</code>：</p>
+<ul>
+<li><strong>两项都满</strong> → 出现绿色按钮「⚡ 汇总生成完整计划书」</li>
+<li><strong>没满</strong> → 显示"还差：去 AI 学伴走通节点（x/5）、去跑完回合（x/4）"，两处文字均可直接点击跳转</li>
+</ul>
+<p>汇总稿的结构：</p>
+<table>
+<thead><tr><th>章节</th><th>内容来源</th></tr></thead>
+<tbody>
+<tr><td>一～五</td><td>5 个承重节点的承诺 + <strong>你当时的取证原文</strong></td></tr>
+<tr><td>六</td><td>4 个跑机回合：冲击 / 你的应对 / 你的理由 / 跑出来的结果</td></tr>
+<tr><td>七</td><td>模拟投资人的三个追问（AI 生成，<strong>只许使用你提供的事实</strong>）</td></tr>
+<tr><td>八</td><td>团队 / 执行计划 / 财务预测 / 风险——<strong>系统不代写</strong>，留出空章</td></tr>
+</tbody></table>
+<h3 id="h112">4.4 提示词生成、交互存档 <code>/student/archives</code>（新增）</h3>
+<figure><img src="images/02-archives.png" alt="图 5 · 学生端交互存档页：左侧版本历史，右侧可切换「可迁移提示词 / 交互全过程文档」并下载" /><figcaption>图 5 · 学生端交互存档页：左侧版本历史，右侧可切换「可迁移提示词 / 交互全过程文档」并下载</figcaption></figure>
+<figure><img src="images/02b-archives-transcript.png" alt="图 6 · 交互全过程文档：逐轮记录学生发言、AI 回复与判定结论" /><figcaption>图 6 · 交互全过程文档：逐轮记录学生发言、AI 回复与判定结论</figcaption></figure>
+<p><strong>什么时候用</strong>：和 AI 学伴聊完一轮，点对话页顶部的「📦 存为新版本」。</p>
+<p><strong>版本机制</strong>：每存一次是一个新版本（v1 → v2 → v3…），<strong>旧版本永远保留，不会被新对话覆盖</strong>。 存档是「那一刻」的快照——你后来又聊了 5 轮，v1 里仍然是当初那 8 轮。</p>
+<p><strong>两份产物</strong></p>
+<table>
+<thead><tr><th>产物</th><th>怎么用</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><strong>可迁移提示词</strong></td><td>「📋 复制提示词」→ 粘到豆包 / DeepSeek / ChatGPT</td><td>自包含。对方不需要知道这个系统是什么，就能按你已完成的取证<strong>从零生成一份完整 BP</strong></td></tr>
+<tr><td><strong>交互全过程文档</strong></td><td>「下载交互文档」</td><td>逐轮记录：你说了什么、AI 回了什么、判定结果、哪些节点放行了、你给它打了多少分</td></tr>
+</tbody></table>
+<p><strong>提示词里有什么</strong></p>
+<ol>
+<li>角色设定 + <strong>三条铁律</strong>（只用素材 / 不替你做决定 / 保留原话）</li>
+<li>你的学生档案（学校、区域、当前进度）</li>
+<li><strong>素材区一</strong>：5 个承重节点的承诺 + 取证原文</li>
+<li><strong>素材区二</strong>：4 个月跑机的冲击 / 应对 / 理由 / 结果</li>
+<li><strong>素材区三</strong>：你对 AI 建议的评分与反思</li>
+<li>八章输出结构 + 写作要求</li>
+</ol>
+<p><strong>没走通的节点会如实留白</strong>——提示词里写「该项未走通，尚未完成验证，不要编造」， 外部 AI 会照做，写成「该部分尚未完成验证」并列出待补清单，不会替你想一个。</p>
+<p><strong>三个下载按钮</strong>：<code>下载提示词</code> / <code>下载交互文档</code> / <code>下载全部</code>（合订本，Markdown 文件）。</p>
+<h3 id="h140">4.5 记录卡 <code>/student/records</code></h3>
+<figure><img src="images/05-records.png" alt="图 7 · 记录卡的完成度检查台：缺哪项直接给跳转按钮" /><figcaption>图 7 · 记录卡的完成度检查台：缺哪项直接给跳转按钮</figcaption></figure>
+<p>页首是<strong>完成度检查表</strong>，5 项：</p>
+<table>
+<thead><tr><th>检查项</th><th>达标线</th><th>未达标时</th></tr></thead>
+<tbody>
+<tr><td>承重节点已走通</td><td>5/5</td><td>按钮「去补做 →」跳到 AI 学伴</td></tr>
+<tr><td>AI 提案已评价</td><td>3 条</td><td>跳到 AI 学伴</td></tr>
+<tr><td>券产出已评价</td><td>1 条</td><td>跳到券商店</td></tr>
+<tr><td>跑机回合已决策</td><td>4/4</td><td>跳到 BP 跑机</td></tr>
+<tr><td>BP 正文字数</td><td>800 字</td><td>跳到 BP 文档</td></tr>
+</tbody></table>
+<p>下方是记录卡列表 + 手动补记表单。</p>
+<h3 id="h154">4.6 券商店 <code>/student/coupons</code>（规则未变）</h3>
+<figure><img src="images/06-coupons.png" alt="图 8 · 5 点启动金券商店：六种券，买前必填理由" /><figcaption>图 8 · 5 点启动金券商店：六种券，买前必填理由</figcaption></figure>
+<p>5 点启动金，1 点 1 券：检索增强 / 逻辑梳理 / PPT / 调研报告 / 模拟投资人 / 修复券。同券限购 2 次，至少留 1 点给修复券。</p>
+<hr />
+<h2 id="h160">五、评分体系</h2>
+<table>
+<thead><tr><th>维度</th><th>权重</th><th>看什么</th><th>数据来源</th></tr></thead>
+<tbody>
+<tr><td>论证质量</td><td>40%</td><td>BP 内容本身：逻辑链、证据、可行性</td><td>BP 文档</td></tr>
+<tr><td>过程留痕</td><td>30%</td><td>取证的真实性、记录卡质量、修订深度、跑机决策理由</td><td>记录卡 / 修订记录 / 跑机</td></tr>
+<tr><td>AI 协作决策</td><td>20%</td><td>花点是否对症、理由是否成立、改写是否投入</td><td>券账本 / 决策过程</td></tr>
+<tr><td>表达</td><td>10%</td><td>成稿呈现（路演、版式）</td><td>BP 文档 / PPT</td></tr>
+</tbody></table>
+<p><strong>一句话原则</strong>：分打给"人做了什么判断"，不打给"AI 产出了多漂亮"。 v2 新增的直接证据：<strong>取证原文的密度与具体程度</strong>（有没有名字、金额、原话）本身就是最好的评分依据。</p>
+<hr />
+<h2 id="h174">六、五道反博弈闸门（系统自动执行）</h2>
+<table>
+<thead><tr><th>#</th><th>闸门</th><th>触发条件</th><th>后果</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>低分附证据</td><td>评分 ≤2 且未填证据</td><td>拒绝写入，要求补齐证据</td></tr>
+<tr><td>2</td><td>教师抽样覆核</td><td>系统随机抽样</td><td>教师端出现待复核记录</td></tr>
+<tr><td>3</td><td>AI 退让上限</td><td>连续低分要求 AI 退让</td><td>超限后 AI 不再退让，转为要求说明</td></tr>
+<tr><td>4</td><td>口试抽查</td><td>期末 / 阶段性</td><td>追问决策与理由，答不上来扣分</td></tr>
+<tr><td>5</td><td>改写率校验</td><td>券产出直接进 BP，改动率 &lt; 30%</td><td>自动告警，过程分打折</td></tr>
+</tbody></table>
+<p>v2 追加的<strong>结构性防博弈</strong>：学生无法靠"多聊几轮"蒙混过关——AI 只在证据成立时放行，聊得再久也拿不到节点。</p>
+<hr />
+<h2 id="h188">七、教师端</h2>
+<figure><img src="images/08-teacher-dashboard.png" alt="图 9 · 班级看板：6 张统计卡、闸门告警与教学建议" /><figcaption>图 9 · 班级看板：6 张统计卡、闸门告警与教学建议</figcaption></figure>
+<figure><img src="images/09-teacher-archives.png" alt="图 10 · 教师端交互存档：按学生分组列出全部版本，可直接查看提示词全文并下载" /><figcaption>图 10 · 教师端交互存档：按学生分组列出全部版本，可直接查看提示词全文并下载</figcaption></figure>
+<figure><img src="images/10-teacher-events.png" alt="图 11 · 事件库：管理跑机事件，可按学期补时事事件" /><figcaption>图 11 · 事件库：管理跑机事件，可按学期补时事事件</figcaption></figure>
+<table>
+<thead><tr><th>页面</th><th>用途</th><th>关键操作</th></tr></thead>
+<tbody>
+<tr><td>班级看板 <code>/teacher/dashboard</code></td><td>全班进度与风险</td><td>看 6 张统计卡（含「提示词与存档」计数）、闸门告警列表、教学建议；右上角「📦 提示词生成、交互存档」直达；<strong>「↺ 重置学生数据」</strong></td></tr>
+<tr><td>量规配置 <code>/teacher/rubric</code></td><td>调整四维权重与评分要点</td><td>修改权重、增删评分要点（期末前锁定）</td></tr>
+<tr><td>抽样覆核 <code>/teacher/review</code></td><td>抽查记录卡与决策证据</td><td>通过 / 退回补充</td></tr>
+<tr><td>事件库 <code>/teacher/events</code></td><td>管理跑机事件</td><td>增删改事件、调严重度、每学期补时事事件</td></tr>
+<tr><td><strong>提示词生成、交互存档 <code>/teacher/archives</code></strong></td><td><strong>看所有学生的提示词与交互文档</strong></td><td>按学生分组列出全部版本，点开可看全文，可下载 Markdown</td></tr>
+</tbody></table>
+<p><strong>「提示词生成、交互存档」页怎么用</strong></p>
+<ul>
+<li>左侧按<strong>学生分组</strong>列出该生所有存档版本（版本号 / 时间 / 轮数 / 节点数 / 跑机数 / 评价数）</li>
+<li>右侧双标签页切换：「可迁移提示词」与「交互全过程文档」，全文直接可读</li>
+<li>三个下载按钮：提示词 / 交互文档 / 全部（合订本）</li>
+<li><strong>教师端下载不受用户限制</strong>，可直接把某个学生的存档打包带走</li>
+</ul>
+<blockquote>⚠️ <strong>当前是单用户演示模式</strong>（全班共用 <code>student-demo</code> 一个身份），所以这个页面目前只会显示一份存档。 接上学号鉴权后，每位学生的存档会自动分开显示，<strong>本页无需任何改动</strong>。</blockquote>
+<p><strong>「↺ 重置学生数据」会做什么</strong></p>
+<ul>
+<li>清空：对话、承重节点、记录卡、券流水、跑机决策与结果、BP 正文与修订、闸门告警、<strong>提示词与交互存档</strong></li>
+<li>保留：用户、班级、券种、事件库、BP 模块（基础配置）</li>
+<li>重建：4 个待决策回合（按 天气 → 政策 → 市场 → 经营 铺开）</li>
+<li>启动金回到 5 点</li>
+</ul>
+<blockquote>用于换新学生演示或学期初清场。<strong>执行前务必确认没有要保留的学生数据</strong>。</blockquote>
+<p><strong>教师端三条建议</strong></p>
+<ol>
+<li>开课前把事件库按本学期时事更新 3–5 条（事件越"本地"，学生越当真）。</li>
+<li>第一次跑机前先在课上演示一回合，讲清"限时 + 说理由"的规则。</li>
+<li>覆核优先看两类：连续低分的学生、取证原文明显敷衍的学生（没有名字和金额的，多半是编的）。</li>
+<li><strong>期末收作业看「提示词生成、交互存档」页</strong>：学生的提示词能直接看出他有没有真去取证——</li>
+</ol>
+<p>   素材区全是"据我了解""行业普遍认为"的，就是没干活。</p>
+<hr />
+<h2 id="h227">八、常见问题（FAQ）</h2>
+<p><strong>Q1：AI 回复很慢或报错 429？</strong> 429 是 API 限流——同一把 key 短时间内调用过多。<strong>全班同时上课时会触发</strong>，等待十几秒即可恢复。长期方案是换成并发额度更高的模型或加备用 key。模型可在 <code>.env.local</code> 的 <code>DASHSCOPE_MODEL</code> 调整。</p>
+<p><strong>Q2：AI 为什么不直接回答我的问题？</strong> 这是设计如此。它不掌握你项目本地的真实情况，编出来的答案一出去就露馅。它的职责是给你"怎么去查"的路线。<strong>想让 AI 变有用，先去查。</strong></p>
+<p><strong>Q3：数据存在哪？会不会丢？</strong> 服务器 SQLite 单文件 <code>/www/wwwroot/bp-harness/data/harness.db</code>。重新部署源码时<strong>已排除 data 目录</strong>（不会覆盖线上数据），但仍建议定期备份。</p>
+<p><strong>Q4：为什么我的券不能买？</strong> 三种可能：①余额不足 ②该券已买 2 次 ③理由没填（或超过 30 字）。</p>
+<p><strong>Q5：为什么我的评分被拒？</strong> 评分 ≤2 时必须写证据（引文、截图描述、数据来源）。这是防"压分换 AI 退让"的闸门。</p>
+<p><strong>Q6：跑机事件是随机的吗？</strong> 不是随机的，但也不是投骰子——它按 天气 / 政策 / 市场 / 经营 四类铺开，保证四个月受的冲击不重样。被冲击的对象是你在 AI 学伴挣到的 5 个承诺。</p>
+<p><strong>Q7：为什么不让我直接写 BP？</strong> 可以写。但完整稿必须等 5 个节点和 4 个回合都齐了才能汇总生成——<strong>没挨过检验的计划书不算写完</strong>。草稿随时可以在 BP 页手写。</p>
+<p><strong>Q8：能重看新手引导吗？</strong> 能。学生主页 →「🎓 新手引导」按钮。</p>
+<hr />
+<h2 id="h255">九、技术信息（教师/管理员）</h2>
+<table>
+<thead><tr><th>项目</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>技术栈</td><td>Next.js 15 + TypeScript + Tailwind 4 + Drizzle ORM + better-sqlite3</td></tr>
+<tr><td>线上地址</td><td><code>http://47.107.31.231:3005/</code></td></tr>
+<tr><td>服务器</td><td>阿里云 ECS 47.107.31.231，<code>/www/wwwroot/bp-harness</code>，pm2 进程 <code>bp-harness</code>，端口 3005</td></tr>
+<tr><td>本地开发</td><td><code>cd bp-harness &amp;&amp; npx next dev -p 3457</code></td></tr>
+<tr><td>构建</td><td>服务器 <code>export PATH=/www/server/nodejs/v20.18.0/bin:$PATH</code> 后 <code>rm -rf .next &amp;&amp; NODE_OPTIONS=--max-old-space-size=768 npx next build</code></td></tr>
+<tr><td>事件库重播种</td><td><code>node scripts/seed-events-changsha.mjs</code>（长沙体育新城情境 20 条）</td></tr>
+<tr><td>数据文件</td><td><code>data/harness.db</code></td></tr>
+<tr><td>环境变量</td><td><code>.env.local</code>：<code>DASHSCOPE_API_KEY</code>、<code>DASHSCOPE_BASE_URL</code>、<code>DASHSCOPE_MODEL</code></td></tr>
+<tr><td>登录状态</td><td>暂未做鉴权，全班共用演示身份 <code>student-demo</code>（正式使用前必须补）</td></tr>
+</tbody></table>
+<blockquote>⚠️ 已踩过的坑：①起 Next.js 之前必须先清 <code>.next</code>；②本地生产构建会被 WorkBuddy 安全钩子拦截（EPERM），<strong>构建一律在服务器做</strong>；③上传源码时<strong>必须排除 <code>./data</code></strong>，否则会覆盖线上数据库。</blockquote>
+<hr />
+<h2 id="h273">十、版本与后续</h2>
+<table>
+<thead><tr><th>版本</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>v1.0（10-30 上午）</td><td>全骨架 + API 连库 + 真实 AI 对话 + BP 编辑器 + 教师看板</td></tr>
+<tr><td><strong>v2.0（本版）</strong></td><td>AI 学伴守门人模式 + 承重节点对话内放行 + 记录卡完成度检查台 + 跑机→BP 汇总闭环 + 长沙体育新城事件库 20 条 + 教师端一键重置</td></tr>
+<tr><td>待办</td><td>学号登录鉴权（正式用前必须做）、每日自动备份 crontab、API 限流应对、BP Skill 评分模块、口试模块、xAPI 导出</td></tr>
+</tbody></table>
+<p><strong>本手册位置</strong>：<code>bp-harness/使用手册_v3_20261030.md</code>。更新请另存新版本，勿覆盖。</p>
+</body>
+</html>
