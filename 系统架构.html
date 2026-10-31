@@ -149,7 +149,7 @@
       <span class="chip">Drizzle ORM 0.45 + better-sqlite3 13</span>
       <span class="chip">阿里百炼 DashScope · deepseek-v4-pro</span>
       <span class="chip">版本 v0.1.0</span>
-      <span class="chip">文档版本 2026-10-31</span>
+      <span class="chip">文档版本 2026-10-31 晚（教师端量规同源）</span>
       <span class="chip">数据来源：源码实扫</span>
     </div>
   </div>
@@ -780,6 +780,7 @@
         <tr><td>README.md</td><td>框架选型（<strong>精益画布</strong>为底线本、BMC 保留设计）、9 块↔5 节点映射、已知弱点</td><td>BMC = Osterwalder 2010；精益画布 = Maurya 2010</td></tr>
         <tr><td>loader.ts</td><td>运行时读取判据表/单位经济模型，按节点切分注入；带 mtime 缓存（改 .md 即生效）+ 内置兜底（文件缺失也不崩）</td><td>代码层，<code>src/lib/methodology/loader.ts</code></td></tr>
         <tr><td>guards.ts（硬闸门）</td><td>顺序闸门 <code>checkSequenceGate</code>：只许放行「当前待推进节点」，越级解锁直接拦截；原话引用闸门 <code>checkCustomerEvidenceGate</code>：customer 放行前证据须含 ≥3 处引号包裹的访谈原话，不足自动打回</td><td>VPC「先客户档案后价值地图」顺序；判据表节点 1「痛点可查 ≥3 条原话引用」</td></tr>
+        <tr><td>教师端量规页（同源展示）</td><td><code>rubric/page.tsx</code> 改为 async 服务端组件，直接调用 <code>getMethodologyNodes()</code> 渲染 5 节点「合格判据 / 反例 / 出处」；与 AI 守门人读同一份判据表.md，页面标注「同源锁定」。教师评分锚点 = AI 拦的标准</td><td>代码层 <code>src/app/teacher/rubric/page.tsx</code> + loader.ts 导出</td></tr>
       </tbody>
     </table>
 
@@ -788,6 +789,7 @@
       <ul style="margin:6px 0 0">
         <li><b>守门人（学生对话）</b>：只注入「当前待推进节点」的判据（更准、更省 token）；回复正文首句标注 <code>【依据：&lt;框架&gt;·&lt;节点&gt;｜&lt;出处&gt;】</code>。实测回复首句即 <code>【依据：VPC·价值主张｜Osterwalder et al. 2014】</code> 并点名命中反例①②③。</li>
         <li><b>模拟投资人（BP 汇总）</b>：注入全部节点判据 + 单位经济模型，挑毛病须对照合格标准并引用出处。</li>
+        <li><b>教师端量规（评分锚点）</b>：量规配置页新增「方法论内核」区，直接渲染 5 节点合格判据 / 反例 / 出处，与守门人同源锁定——老师评分参照的标准 = AI 拦的标准，三套真正统一。</li>
       </ul>
     </div>
 
