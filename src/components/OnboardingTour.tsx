@@ -132,7 +132,7 @@ export default function OnboardingTour() {
             <span className="rounded-full bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white">
               {idx + 1} / {STEPS.length}
             </span>
-            <span className="text-xs text-neutral-400">新手引导</span>
+            <span className="text-xs text-neutral-500">新手引导</span>
           </div>
           <div className="flex gap-1.5">
             {STEPS.map((_, i) => (
@@ -174,7 +174,7 @@ export default function OnboardingTour() {
         <div className="flex items-center justify-between border-t border-neutral-100 bg-neutral-50 px-6 py-4">
           <button
             onClick={close}
-            className="text-sm text-neutral-400 hover:text-neutral-600"
+            className="text-sm text-neutral-500 hover:text-neutral-600"
           >
             跳过引导
           </button>

@@ -125,7 +125,7 @@ export default function TeacherDashboard() {
           </div>
           <div className="mt-4 space-y-3">
             {flags.length === 0 && (
-              <div className="text-sm text-neutral-400 py-8 text-center">
+              <div className="text-sm text-neutral-500 py-8 text-center">
                 ✓ 暂无告警
               </div>
             )}
@@ -139,7 +139,7 @@ export default function TeacherDashboard() {
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-neutral-700">{f.detail}</p>
-                  <p className="mt-0.5 text-xs text-neutral-400">
+                  <p className="mt-0.5 text-xs text-neutral-500">
                     {f.createdAt?.replace("T", " ").slice(0, 16)}
                   </p>
                 </div>

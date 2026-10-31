@@ -33,11 +33,15 @@ const PAGES = [
   "/teacher/archives",
 ];
 
-// 正文 4.5:1 / 大字与次要信息 3:1；低于 3 一律算缺陷
-const MIN_RATIO = 3.0;
+// 双档阈值：
+//   致命（<3.0）—— 文字基本看不清，必须修，退出码非 0
+//   偏弱（3.0~4.5）—— 弱化的次要说明文字，可接受，只统计不阻塞
+//   正文标准是 4.5:1，但次要注释类用 3:1 属常见设计选择
+const FATAL_RATIO = 3.0;
+const WEAK_RATIO = 4.5;
 
 const scan = async (page) =>
-  page.evaluate((minRatio) => {
+  page.evaluate(({ fatal, weak }) => {
     const cv = document.createElement("canvas");
     cv.width = cv.height = 1;
     const g = cv.getContext("2d");
@@ -107,10 +111,11 @@ const scan = async (page) =>
       const l1 = lum(tc.r, tc.g, tc.b);
       const l2 = lum(bg.r, bg.g, bg.b);
       const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-      if (ratio < minRatio) {
+      if (ratio < weak) {
         const r = el.getBoundingClientRect();
         if (r.width < 2 || r.height < 2) return;
         out.push({
+          fatal: ratio < fatal,
           ratio: +ratio.toFixed(2),
           tag: el.tagName,
           text: el.textContent.trim().slice(0, 46),
@@ -122,11 +127,12 @@ const scan = async (page) =>
     };
     walk(document.body);
     return out;
-  }, MIN_RATIO);
+  }, { fatal: FATAL_RATIO, weak: WEAK_RATIO });
 
 const main = async () => {
   const browser = await chromium.launch({ channel: "chrome" });
-  let total = 0;
+  let fatalTotal = 0;
+  let weakTotal = 0;
   let failed = 0;
 
   if (TARGET.startsWith("file://")) {
@@ -136,14 +142,18 @@ const main = async () => {
     const page = await ctx.newPage();
     await page.setContent(html, { waitUntil: "networkidle" });
     const bad = await scan(page);
-    total += bad.length;
-    console.log(`\n### ${TARGET}\n  → ${bad.length} 处低对比度（阈值 ${MIN_RATIO}）`);
-    bad.forEach((b) =>
+    const fatal = bad.filter((b) => b.fatal);
+    const weak = bad.filter((b) => !b.fatal);
+    fatalTotal += fatal.length;
+    weakTotal += weak.length;
+    console.log(`\n### ${TARGET}`);
+    console.log(`  致命 ${fatal.length} 处 / 偏弱 ${weak.length} 处`);
+    fatal.forEach((b) =>
       console.log(
-        `  比${b.ratio} <${b.tag}> 底${b.bg} 字${b.fg}  "${b.text}"\n      ${b.cls}`
+        `  ✗ 比${b.ratio} <${b.tag}> 底${b.bg} 字${b.fg}  "${b.text}"\n      ${b.cls}`
       )
     );
-    if (bad.length) failed++;
+    if (fatal.length) failed++;
   } else {
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     // 跳过新手引导弹窗
@@ -157,21 +167,30 @@ const main = async () => {
       await page.goto(TARGET + path, { waitUntil: "networkidle", timeout: 60000 });
       await page.waitForTimeout(1200);
       const bad = await scan(page);
-      total += bad.length;
-      const flag = bad.length ? "❌" : "✅";
-      console.log(`${flag} ${path}  → ${bad.length} 处`);
-      bad.slice(0, 6).forEach((b) =>
+      const fatal = bad.filter((b) => b.fatal);
+      const weak = bad.filter((b) => !b.fatal);
+      fatalTotal += fatal.length;
+      weakTotal += weak.length;
+      const flag = fatal.length ? "❌" : "✅";
+      console.log(
+        `${flag} ${path}  → 致命 ${fatal.length} 处 / 偏弱 ${weak.length} 处`
+      );
+      fatal.slice(0, 6).forEach((b) =>
         console.log(
-          `     比${b.ratio} <${b.tag}> 底${b.bg} 字${b.fg}  "${b.text}"\n       ${b.cls}`
+          `     ✗ 比${b.ratio} <${b.tag}> 底${b.bg} 字${b.fg}  "${b.text}"\n       ${b.cls}`
         )
       );
-      if (bad.length) failed++;
+      if (fatal.length) failed++;
     }
   }
 
   await browser.close();
   console.log(
-    `\n${failed === 0 ? "✅ 全部通过" : "❌ 有 " + failed + " 处需要修"}：共 ${total} 处低对比度元素`
+    `\n${failed === 0 ? "✅ 无致命对比度缺陷" : "❌ 有 " + failed + " 个页面存在致命缺陷"}` +
+      `（致命 ${fatalTotal} 处，偏弱 ${weakTotal} 处）`
+  );
+  console.log(
+    `阈值：致命 <${FATAL_RATIO}，偏弱 ${FATAL_RATIO}~${WEAK_RATIO}（次要说明文字可接受）`
   );
   process.exit(failed === 0 ? 0 : 1);
 };

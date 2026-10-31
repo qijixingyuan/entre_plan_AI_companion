@@ -26,7 +26,7 @@ export function EmptyState({ label, hint }: { label: string; hint?: string }) {
   return (
     <div className="rounded-xl border border-dashed border-neutral-300 bg-white px-6 py-12 text-center">
       <div className="text-sm text-neutral-600">{label}</div>
-      {hint ? <div className="mt-1.5 text-xs text-neutral-400">{hint}</div> : null}
+      {hint ? <div className="mt-1.5 text-xs text-neutral-500">{hint}</div> : null}
     </div>
   );
 }

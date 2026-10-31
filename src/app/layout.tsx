@@ -40,13 +40,13 @@ export default function RootLayout({
             <Link href="/" className="text-sm font-semibold tracking-tight">
               🧠 BP Harness
             </Link>
-            <div className="mt-0.5 text-xs text-neutral-400">
+            <div className="mt-0.5 text-xs text-neutral-500">
               创业计划书 AI 协作
             </div>
           </div>
 
           <nav className="flex-1 overflow-y-auto px-3 py-4">
-            <div className="mb-2 px-2 text-xs font-medium text-neutral-400">
+            <div className="mb-2 px-2 text-xs font-medium text-neutral-500">
               学生端
             </div>
             {STUDENT_LINKS.map((l) => (
@@ -60,7 +60,7 @@ export default function RootLayout({
               </Link>
             ))}
 
-            <div className="mb-2 mt-6 px-2 text-xs font-medium text-neutral-400">
+            <div className="mb-2 mt-6 px-2 text-xs font-medium text-neutral-500">
               教师端
             </div>
             {TEACHER_LINKS.map((l) => (
@@ -76,7 +76,7 @@ export default function RootLayout({
           </nav>
 
           <div className="border-t border-neutral-100 px-4 py-3">
-            <div className="text-xs text-neutral-400">演示学生</div>
+            <div className="text-xs text-neutral-500">演示学生</div>
             <div className="text-sm font-medium">student-demo</div>
           </div>
         </aside>

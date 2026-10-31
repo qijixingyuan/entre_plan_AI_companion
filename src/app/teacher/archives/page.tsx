@@ -95,7 +95,7 @@ export default function TeacherArchivesPage() {
         {/* 学生分组列表 */}
         <div>
           {loading ? (
-            <div className="text-sm text-neutral-400">载入中…</div>
+            <div className="text-sm text-neutral-500">载入中…</div>
           ) : groups.length === 0 ? (
             <EmptyState
               label="还没有任何存档"
@@ -110,9 +110,9 @@ export default function TeacherArchivesPage() {
                       {g.userName}
                     </span>
                     {g.studentNo && (
-                      <span className="text-xs text-neutral-400">{g.studentNo}</span>
+                      <span className="text-xs text-neutral-500">{g.studentNo}</span>
                     )}
-                    <span className="ml-auto text-xs text-neutral-400">
+                    <span className="ml-auto text-xs text-neutral-500">
                       {g.archives.length} 份
                     </span>
                   </div>
@@ -129,7 +129,7 @@ export default function TeacherArchivesPage() {
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">第 {a.version} 版</span>
-                          <span className="text-[11px] text-neutral-400">
+                          <span className="text-[11px] text-neutral-500">
                             {a.createdAt.replace("T", " ").slice(5, 16)}
                           </span>
                         </div>
@@ -165,7 +165,7 @@ export default function TeacherArchivesPage() {
                 <div>
                   <div className="text-sm font-medium">
                     {active.userName} · 第 {active.version} 版
-                    <span className="ml-2 text-xs font-normal text-neutral-400">
+                    <span className="ml-2 text-xs font-normal text-neutral-500">
                       {active.createdAt.replace("T", " ").slice(0, 16)}
                     </span>
                   </div>

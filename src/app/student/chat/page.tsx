@@ -193,13 +193,13 @@ export default function ChatPage() {
                 className={`rounded-full px-2.5 py-1 ${
                   n.unlocked
                     ? "bg-emerald-50 text-emerald-700 font-medium"
-                    : "bg-neutral-100 text-neutral-400"
+                    : "bg-neutral-100 text-neutral-500"
                 }`}
                 title={n.commitment || "未放行"}
               >
                 {n.unlocked ? "✓" : "○"} {n.label}
               </span>
-              {i < nodes.length - 1 && <span className="mx-1 text-neutral-300">·</span>}
+              {i < nodes.length - 1 && <span className="mx-1 text-neutral-400">·</span>}
             </span>
           ))}
           {allDone && (
@@ -221,12 +221,12 @@ export default function ChatPage() {
           )}
         </div>
         {messages.length > 0 && (
-          <div className="mt-2 flex items-center gap-2 text-[11px] text-neutral-400">
+          <div className="mt-2 flex items-center gap-2 text-[11px] text-neutral-500">
             <span>已聊 {messages.filter((m) => m.role === "user").length} 轮</span>
             <Link href="/student/archives" className="text-blue-600 hover:underline">
               提示词生成、交互存档 →
             </Link>
-            <span className="text-neutral-300">|</span>
+            <span className="text-neutral-400">|</span>
             <span>存档后可复制提示词到豆包/DeepSeek 生成完整 BP</span>
           </div>
         )}
@@ -294,7 +294,7 @@ export default function ChatPage() {
                     </div>
                     {m.role === "assistant" && !m.rated && (
                       <div className="mt-3 flex items-center gap-1 border-t border-neutral-100 pt-2">
-                        <span className="mr-1 text-xs text-neutral-400">这条有帮助吗</span>
+                        <span className="mr-1 text-xs text-neutral-500">这条有帮助吗</span>
                         {[1, 2, 3, 4, 5].map((n) => (
                           <button
                             key={n}
@@ -314,7 +314,7 @@ export default function ChatPage() {
               );
             })}
             {sending && (
-              <div className="flex items-center gap-2 text-sm text-neutral-400">
+              <div className="flex items-center gap-2 text-sm text-neutral-500">
                 <span className="flex gap-1">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-neutral-300" />
                   <span

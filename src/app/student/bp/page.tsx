@@ -128,7 +128,7 @@ export default function BPEditorPage() {
         <span className={gate.nodes >= 5 ? "text-emerald-600" : "text-neutral-500"}>
           承重节点 {gate.nodes}/5 {gate.nodes >= 5 ? "✓" : ""}
         </span>
-        <span className="text-neutral-300">|</span>
+        <span className="text-neutral-400">|</span>
         <span className={gate.sim >= 4 ? "text-emerald-600" : "text-neutral-500"}>
           跑机回合 {gate.sim}/4 {gate.sim >= 4 ? "✓" : ""}
         </span>
@@ -142,7 +142,7 @@ export default function BPEditorPage() {
               {generating ? "汇总中…" : "⚡ 汇总生成完整计划书"}
             </button>
           ) : (
-            <span className="text-neutral-400">
+            <span className="text-neutral-500">
               还差：
               {gate.nodes < 5 && (
                 <Link href="/student/chat" className="ml-1 text-blue-600 hover:underline">
@@ -197,7 +197,7 @@ export default function BPEditorPage() {
                 dangerouslySetInnerHTML={{ __html: renderMd(content) }}
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-neutral-400">
+              <div className="flex h-full items-center justify-center text-sm text-neutral-500">
                 汇总生成后，这里显示排版效果
               </div>
             )}
@@ -209,7 +209,7 @@ export default function BPEditorPage() {
         <div className="mt-3 rounded-xl border border-neutral-200 bg-white px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="text-xs font-medium text-neutral-500">修订历史</div>
-            <div className="text-xs text-neutral-400">{revisions.length} 个版本</div>
+            <div className="text-xs text-neutral-500">{revisions.length} 个版本</div>
           </div>
           <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
             {revisions.map((r) => (
@@ -218,7 +218,7 @@ export default function BPEditorPage() {
                 className="shrink-0 rounded-lg border border-neutral-100 bg-neutral-50 px-3 py-1.5 text-xs"
               >
                 <div className="text-neutral-500">{TRIGGER_LABELS[r.trigger] || r.trigger}</div>
-                <div className="text-neutral-400">{r.diffSummary}</div>
+                <div className="text-neutral-500">{r.diffSummary}</div>
               </div>
             ))}
           </div>

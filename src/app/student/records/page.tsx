@@ -99,7 +99,7 @@ export default function RecordsPage() {
                 : "border-amber-200 bg-amber-50/50"
             }`}
           >
-            <span className={`text-lg ${it.done ? "text-emerald-600" : "text-amber-500"}`}>
+            <span className={`text-lg ${it.done ? "text-emerald-600" : "text-amber-600"}`}>
               {it.done ? "✓" : "!"}
             </span>
             <div className="min-w-0 flex-1">
@@ -157,7 +157,7 @@ export default function RecordsPage() {
               >
                 评分 {c.rating}/5
               </span>
-              <span className="text-neutral-400">
+              <span className="text-neutral-500">
                 {c.createdAt?.replace("T", " ").slice(0, 16) || ""}
               </span>
             </div>

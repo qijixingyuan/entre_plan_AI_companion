@@ -134,7 +134,7 @@ export default function CouponsPage() {
                     <span className="font-medium">{defs.find((d) => d.code === p.couponCode)?.name || p.couponCode}</span>
                     <span className="ml-2 text-neutral-500">「{p.reason}」</span>
                   </span>
-                  <span className="text-neutral-400">-{p.spent} 点</span>
+                  <span className="text-neutral-500">-{p.spent} 点</span>
                 </div>
               ))}
             </div>

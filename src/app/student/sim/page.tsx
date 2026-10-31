@@ -117,7 +117,7 @@ export default function SimPage() {
           本轮受检验的承诺（来自你在 AI 学伴挣到的承重节点）
         </div>
         {nodes.length === 0 ? (
-          <div className="text-xs text-neutral-400">
+          <div className="text-xs text-neutral-500">
             还没有承重节点。跑机跑的是你的承诺，先去 AI 学伴把它们挣出来。
           </div>
         ) : (
@@ -158,12 +158,12 @@ export default function SimPage() {
                     }`}>
                       {event.isOpportunity ? "机会" : "威胁"} · {event.category} · 严重度 {event.severity}
                     </span>
-                    <span className="text-neutral-400">{r.eventCode}</span>
+                    <span className="text-neutral-500">{r.eventCode}</span>
                   </div>
                   <p className="mt-2 text-sm text-neutral-700">{event.narrative}</p>
                 </>
               ) : (
-                <div className="text-sm text-neutral-400">未投放事件</div>
+                <div className="text-sm text-neutral-500">未投放事件</div>
               )}
 
               {/* 已决策 */}

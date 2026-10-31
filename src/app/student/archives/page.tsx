@@ -150,7 +150,7 @@ export default function StudentArchivesPage() {
           )}
 
           {loading ? (
-            <div className="text-sm text-neutral-400">载入中…</div>
+            <div className="text-sm text-neutral-500">载入中…</div>
           ) : archives.length === 0 ? (
             <EmptyState
               label="还没有存档"
@@ -170,7 +170,7 @@ export default function StudentArchivesPage() {
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">第 {a.version} 版</span>
-                    <span className="text-[11px] text-neutral-400">
+                    <span className="text-[11px] text-neutral-500">
                       {a.createdAt.replace("T", " ").slice(5, 16)}
                     </span>
                   </div>
@@ -203,7 +203,7 @@ export default function StudentArchivesPage() {
                 <div>
                   <div className="text-sm font-medium">
                     第 {active.version} 版
-                    <span className="ml-2 text-xs font-normal text-neutral-400">
+                    <span className="ml-2 text-xs font-normal text-neutral-500">
                       {active.createdAt.replace("T", " ").slice(0, 16)}
                     </span>
                   </div>

@@ -144,7 +144,7 @@ export default function StudentHome() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{step.title}</span>
-                <span className="text-xs text-neutral-400">步骤 {i + 1}</span>
+                <span className="text-xs text-neutral-500">步骤 {i + 1}</span>
               </div>
               <div className="text-xs text-neutral-500 truncate">{step.desc}</div>
             </div>
@@ -158,7 +158,7 @@ export default function StudentHome() {
                   style={{ width: `${Math.min(100, (step.done / step.total) * 100)}%` }}
                 />
               </div>
-              <span className="text-neutral-300 group-hover:text-blue-500 transition">→</span>
+              <span className="text-neutral-400 group-hover:text-blue-600 transition">→</span>
             </div>
           </Link>
         ))}

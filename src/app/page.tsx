@@ -23,7 +23,7 @@ export default function Home() {
             <p className="mt-1 text-sm text-blue-700">
               决策卡 → AI 认知伙伴 → BP 写作 → 跑机检验
             </p>
-            <div className="mt-4 text-xs text-blue-500">进入学习 →</div>
+            <div className="mt-4 text-xs text-blue-600">进入学习 →</div>
           </Link>
 
           <Link
@@ -35,7 +35,7 @@ export default function Home() {
             <p className="mt-1 text-sm text-emerald-700">
               班级看板 → 量规配置 → 抽样覆核 → 事件库管理
             </p>
-            <div className="mt-4 text-xs text-emerald-500">进入管理 →</div>
+            <div className="mt-4 text-xs text-emerald-600">进入管理 →</div>
           </Link>
         </div>
 
