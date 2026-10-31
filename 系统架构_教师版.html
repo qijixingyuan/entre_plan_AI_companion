@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>系统架构说明（教师版）· bp-harness 创业计划书 AI 学习搭档</title>
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --ink-2:#475569; --ink-3:#64748b;
+    --line:#e2e8f0; --line-2:#cbd5e1;
+    --blue:#1d4ed8; --blue-bg:#eff6ff; --blue-bd:#93c5fd;
+    --indigo:#4338ca; --indigo-bg:#eef2ff;
+    --emerald:#047857; --emerald-bg:#ecfdf5; --emerald-bd:#6ee7b7;
+    --amber-bg:#fef3c7; --amber-bd:#fcd34d; --amber-t:#92400e; --amber-t2:#78350f;
+    --red-bg:#fef2f2; --red-bd:#fca5a5; --red-t:#b91c1c; --red-t2:#7f1d1d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.7;font-size:15px}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 28px 80px}
+  header.top{background:linear-gradient(135deg,#1e3a5f,#312e81);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:10px}
+  header.top h1{margin:0;font-size:24px;font-weight:800;letter-spacing:.5px}
+  header.top p{margin:8px 0 0;color:#c7d2fe;font-size:14px}
+  .tag{display:inline-block;margin-top:14px;background:rgba(255,255,255,.14);color:#fff;
+    font-size:12px;padding:4px 12px;border-radius:999px;margin-right:8px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 26px;margin-top:22px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .band{background:#1e3a5f;color:#fff;border-radius:10px;padding:12px 18px;margin:-22px -26px 18px;
+    font-size:17px;font-weight:700}
+  .band small{display:block;font-weight:400;font-size:12.5px;color:#bfdbfe;margin-top:3px}
+  h3.sub{font-size:15px;color:var(--blue);margin:18px 0 8px;font-weight:700}
+  p{margin:10px 0;color:var(--ink-2)}
+  .lead{font-size:15.5px;color:var(--ink)}
+  ul,ol{margin:10px 0;padding-left:22px;color:var(--ink-2)}
+  li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+  .kcard{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#fbfcfe}
+  .kcard b{color:var(--ink)}
+  .kcard .n{font-size:22px;font-weight:800;color:var(--blue)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:#f1f5f9;color:var(--ink);font-weight:700}
+  td .dim{color:var(--ink-3);font-size:13px}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px}
+  .pill.on{background:#dcfce7;color:#166534}
+  .pill.soon{background:#fef9c3;color:#854d0e}
+  .pill.off{background:var(--red-bg);color:var(--red-t)}
+  .callout{border-left:4px solid var(--blue);background:var(--blue-bg);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .warn{border-left:4px solid var(--red-t);background:var(--red-bg);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .warn b{color:var(--red-t)}
+  .ok{border-left:4px solid var(--emerald);background:var(--emerald-bg);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .diagram{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin:14px 0;overflow-x:auto}
+  .diagram svg{width:100%;height:auto;min-width:980px;display:block}
+  .risk{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);
+    border-radius:12px;margin:12px 0;background:#fff}
+  .risk .rank{flex:0 0 34px;height:34px;border-radius:9px;background:var(--red-t);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+  .risk .body{flex:1}
+  .risk .body h4{margin:0 0 4px;font-size:15px;color:var(--ink)}
+  .risk .body .why{color:var(--red-t);font-weight:600;font-size:13.5px}
+  .risk .body .do{color:var(--ink-2);font-size:13.5px;margin-top:4px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+  .legend span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2)}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+  footer{color:var(--ink-3);font-size:12.5px;text-align:center;margin-top:28px}
+  .note-tech{font-size:12.5px;color:#475569;background:#f1f5f9;border-radius:8px;padding:8px 12px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>系统架构说明（教师版）</h1>
+  <p>bp-harness · 大学生创业计划书撰写 · AI 学习搭档系统</p>
+  <div>
+    <span class="tag">面向任课教师与同行</span>
+    <span class="tag">无需编程基础</span>
+    <span class="tag">文档版本 2026-10-31</span>
+  </div>
+</header>
+
+<!-- ============ 第一章 ============ -->
+<section id="ch1">
+  <div class="band">一、这份文档是给谁看的 / 系统一句话定位
+    <small>读完这一章，你就知道这套东西能不能进你的课堂</small>
+  </div>
+  <p class="lead">这是给高职《大学生创业计划书撰写》课配套用的 <b>AI 学习搭档系统</b>。它要解决的核心痛点很直白——学生把写计划书的活直接丢给豆包、DeepSeek 等免费 AI，自己不动脑。</p>
+  <p>本系统让 AI 当 <b>「守门人」</b>：不直接给答案，而是派学生去<b>取证</b>、去<b>跑通商业逻辑</b>、把每一步思考<b>留痕</b>；只有靠真实证据挣过来，才算走完一个环节。学生想外包给 AI，系统就失去意义——这正是设计目的。</p>
+  <div class="callout">本说明用任课教师能看懂的语言写就，刻意不出现任何技术黑话（没有"路由""接口""GET/POST"这类词）。你要判断的就三件事：<b>它怎么运转教学、哪些环节能信任、哪里还不行</b>。后两件事集中在第六章。</div>
+</section>
+
+<!-- ============ 第二章 ============ -->
+<section id="ch2">
+  <div class="band">二、学生怎么用（学习路线五站）
+    <small>每一站都强制认知参与，外包给 AI 就过不去</small>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1360 900" role="img" aria-label="师生双角色闭环架构图">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+        </marker>
+      </defs>
+
+      <!-- 列标题 -->
+      <text x="40" y="96" font-size="14" font-weight="700" fill="#1d4ed8">学生端 · 学习路线</text>
+      <text x="560" y="96" font-size="14" font-weight="700" fill="#4338ca">数据中枢</text>
+      <text x="840" y="96" font-size="14" font-weight="700" fill="#047857">教师端 · 工作台</text>
+
+      <!-- 学生五站 -->
+      <g>
+        <rect x="40" y="116" width="480" height="74" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="56" y="142" font-size="14" font-weight="700" fill="#1e3a8a">第 1 站 · AI 学伴（守门人）</text>
+        <text x="56" y="164" font-size="12" fill="#475569">不直接给答案，派取证任务、追问“你的证据呢”</text>
+        <text x="56" y="182" font-size="11" font-weight="700" fill="#b45309">↳ 仅此站调用 AI 模型服务（见底部）</text>
+      </g>
+      <line x1="280" y1="190" x2="280" y2="206" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="40" y="208" width="480" height="74" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="56" y="234" font-size="14" font-weight="700" fill="#1e3a8a">第 2 站 · BP 文档撰写（含 5 个承重节点）</text>
+        <text x="56" y="256" font-size="12" fill="#475569">目标客户 / 价值主张 / 收入模式 / 关键指标 / 竞争壁垒</text>
+        <text x="56" y="274" font-size="11" fill="#475569">每一关靠“拿回真东西”才放行，空谈过不了</text>
+      </g>
+      <line x1="280" y1="282" x2="280" y2="298" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="40" y="300" width="480" height="74" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="56" y="326" font-size="14" font-weight="700" fill="#1e3a8a">第 3 站 · 5 点启动金（券商店）</text>
+        <text x="56" y="348" font-size="12" fill="#475569">5 次“把钱花在哪”的决策权，加强自己的薄弱环节</text>
+        <text x="56" y="366" font-size="11" fill="#475569">这是过程分的直接证据（当前买完无产出，见第六章）</text>
+      </g>
+      <line x1="280" y1="374" x2="280" y2="390" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="40" y="392" width="480" height="74" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="56" y="418" font-size="14" font-weight="700" fill="#1e3a8a">第 4 站 · BP 跑机（4 回合冲击）</text>
+        <text x="56" y="440" font-size="12" fill="#475569">天气 / 政策 / 市场 / 经营 四类冲击下运行 4 个月</text>
+        <text x="56" y="458" font-size="11" fill="#475569">挨过冲击才算结实</text>
+      </g>
+      <line x1="280" y1="466" x2="280" y2="482" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="40" y="484" width="480" height="74" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="56" y="510" font-size="14" font-weight="700" fill="#1e3a8a">第 5 站 · 记录卡</text>
+        <text x="56" y="532" font-size="12" fill="#475569">每次评价 AI、每个决策理由都留痕</text>
+        <text x="56" y="550" font-size="11" fill="#475569">形成“我为什么这么选”的证据链</text>
+      </g>
+
+      <!-- 学生 → 数据中枢 箭头 -->
+      <line x1="520" y1="153" x2="556" y2="300" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="520" y1="245" x2="556" y2="320" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="520" y1="337" x2="556" y2="340" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="520" y1="429" x2="556" y2="360" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="520" y1="521" x2="556" y2="380" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+
+      <!-- 数据中枢 -->
+      <g>
+        <rect x="560" y="200" width="240" height="380" rx="12" fill="#4338ca"/>
+        <text x="680" y="232" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">学生过程记录档案</text>
+        <text x="680" y="254" text-anchor="middle" font-size="11" fill="#c7d2fe">所有过程证据可追溯、教师可查</text>
+        <line x1="584" y1="270" x2="776" y2="270" stroke="#a5b4fc" stroke-width="1"/>
+        <text x="584" y="298" font-size="13" font-weight="600" fill="#ffffff">① 取证材料库</text>
+        <text x="584" y="330" font-size="13" font-weight="600" fill="#ffffff">② 节点决策档案</text>
+        <text x="584" y="362" font-size="13" font-weight="600" fill="#ffffff">③ 记录卡</text>
+        <text x="584" y="394" font-size="13" font-weight="600" fill="#ffffff">④ 跑机决策与结果</text>
+        <text x="584" y="426" font-size="13" font-weight="600" fill="#ffffff">⑤ 交互存档（版本保留）</text>
+        <line x1="584" y1="446" x2="776" y2="446" stroke="#a5b4fc" stroke-width="1"/>
+        <text x="680" y="478" text-anchor="middle" font-size="11" fill="#c7d2fe">不是“交一份稿子就完事”</text>
+        <text x="680" y="500" text-anchor="middle" font-size="11" fill="#c7d2fe">学生改十次，教师能看到</text>
+        <text x="680" y="522" text-anchor="middle" font-size="11" fill="#c7d2fe">每一次的来龙去脉</text>
+        <text x="680" y="556" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fecaca">⚠ P1-6 数据库无自动备份</text>
+      </g>
+
+      <!-- 数据中枢 → 教师 箭头 -->
+      <line x1="800" y1="300" x2="836" y2="153" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="800" y1="320" x2="836" y2="245" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="800" y1="340" x2="836" y2="337" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+      <line x1="800" y1="360" x2="836" y2="429" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+
+      <!-- 教师四块 -->
+      <g>
+        <rect x="840" y="116" width="480" height="74" rx="10" fill="#ecfdf5" stroke="#6ee7b7"/>
+        <text x="856" y="142" font-size="14" font-weight="700" fill="#065f46">教学看板</text>
+        <text x="856" y="164" font-size="12" fill="#475569">全班进度一览：谁走到第几站、哪些节点被卡住</text>
+      </g>
+      <g>
+        <rect x="840" y="208" width="480" height="74" rx="10" fill="#ecfdf5" stroke="#6ee7b7"/>
+        <text x="856" y="234" font-size="14" font-weight="700" fill="#065f46">查看学生存档（按学号）</text>
+        <text x="856" y="256" font-size="12" fill="#475569">取证记录 / 节点进度 / 跑机结果 / 汇总稿</text>
+      </g>
+      <g>
+        <rect x="840" y="300" width="480" height="74" rx="10" fill="#ecfdf5" stroke="#6ee7b7"/>
+        <text x="856" y="326" font-size="14" font-weight="700" fill="#065f46">评分量规</text>
+        <text x="856" y="348" font-size="12" fill="#475569">四维权重，期末前可锁定</text>
+      </g>
+      <g>
+        <rect x="840" y="392" width="480" height="74" rx="10" fill="#ecfdf5" stroke="#6ee7b7"/>
+        <text x="856" y="418" font-size="14" font-weight="700" fill="#065f46">抽样覆核 + 口试抽查</text>
+        <text x="856" y="440" font-size="12" fill="#475569">防学生给自己打高分的机制（详见第四章）</text>
+      </g>
+
+      <!-- 外部 AI 服务 -->
+      <g>
+        <rect x="40" y="620" width="1280" height="70" rx="12" fill="#fef3c7" stroke="#fcd34d"/>
+        <text x="60" y="650" font-size="15" font-weight="700" fill="#92400e">AI 模型服务（阿里百炼）</text>
+        <text x="60" y="674" font-size="12.5" fill="#78350f">仅「第 1 站 AI 学伴」调用，不存储任何学生数据 · 当前同一密钥短时高频会触发限流（见第六章 P1-6）</text>
+      </g>
+
+      <!-- 底部断点条 -->
+      <text x="40" y="724" font-size="13" font-weight="700" fill="#b91c1c">当前已知断点（按“能不能上课用”排序，详见第六章）</text>
+      <g>
+        <rect x="40" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="52" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P0-3 无学号鉴权</text>
+        <text x="52" y="776" font-size="11" fill="#7f1d1d">全班共用身份，张三看李四</text>
+        <text x="52" y="790" font-size="11" fill="#7f1d1d">发给学生就出事</text>
+
+        <rect x="258" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="270" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P0-2 教师端空壳</text>
+        <text x="270" y="776" font-size="11" fill="#7f1d1d">抽样覆核 / 量规配置</text>
+        <text x="270" y="790" font-size="11" fill="#7f1d1d">不连数据库</text>
+
+        <rect x="476" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="488" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P0-1 券无产出</text>
+        <text x="488" y="776" font-size="11" fill="#7f1d1d">买完什么都没生成</text>
+        <text x="488" y="790" font-size="11" fill="#7f1d1d">激励失效</text>
+
+        <rect x="694" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="706" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P1-6 限流+无备份</text>
+        <text x="706" y="776" font-size="11" fill="#7f1d1d">全班上课必崩</text>
+        <text x="706" y="790" font-size="11" fill="#7f1d1d">数据全丢</text>
+
+        <rect x="912" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="924" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P1-4 无写BP闭环</text>
+        <text x="924" y="776" font-size="11" fill="#7f1d1d">学生得手抄 AI 好段落</text>
+        <text x="924" y="790" font-size="11" fill="#7f1d1d">体验断点</text>
+
+        <rect x="1130" y="734" width="190" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+        <text x="1142" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P1-5 口试未接线</text>
+        <text x="1142" y="776" font-size="11" fill="#7f1d1d">防作弊最后兜底</text>
+        <text x="1142" y="790" font-size="11" fill="#7f1d1d">功能不存在</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw" style="background:#eff6ff;border:1px solid #93c5fd"></i>学生端</span>
+    <span><i class="sw" style="background:#4338ca"></i>数据中枢（深底白字）</span>
+    <span><i class="sw" style="background:#ecfdf5;border:1px solid #6ee7b7"></i>教师端</span>
+    <span><i class="sw" style="background:#fef3c7;border:1px solid #fcd34d"></i>外部 AI 服务</span>
+    <span><i class="sw" style="background:#fef2f2;border:1px solid #fca5a5"></i>已知断点</span>
+  </div>
+
+  <p>学生在系统里沿 <b>5 个站点</b> 推进，每一站都强制认知参与：</p>
+  <ol>
+    <li><b>AI 学伴（守门人）</b>：学生发一段话，AI 不直接给答案，而是派“取证任务”、追问“你的证据呢”。目的是逼学生离开屏幕去接触真实市场与真实用户。</li>
+    <li><b>BP 文档撰写（含 5 个承重节点）</b>：目标客户、价值主张、收入模式、关键指标、竞争壁垒。每个节点都要靠“拿回真东西”才放行，空谈过不了。</li>
+    <li><b>5 点启动金（券商店）</b>：学生有 5 次“把钱花在哪”的决策权，用来加强自己的薄弱环节——这是过程分的直接证据。</li>
+    <li><b>BP 跑机（4 回合冲击）</b>：让写好的计划书在天气、政策、市场、经营四类冲击下运行 4 个月，挨过冲击才算结实。</li>
+    <li><b>记录卡</b>：每次对 AI 的评价、每个决策的理由都留痕，形成“我为什么这么选”的证据链。</li>
+  </ol>
+  <div class="callout"><b>教师为什么这么设计：</b>把“写计划书”从一次性交稿，拆成“取证 → 论证 → 承压 → 留痕”的连续动作。一旦学生把活外包给 AI，这些动作就全断在系统里——这正是系统要对抗的。</div>
+</section>
+
+<!-- ============ 第三章 ============ -->
+<section id="ch3">
+  <div class="band">三、教师怎么管（教师工作台）
+    <small>教师端能做什么，不列技术路径，只说教学动作</small>
+  </div>
+  <div class="kv">
+    <div class="kcard"><b>教学看板</b><div class="n">全班</div>进度一览：谁走到第几站、哪些节点被卡住。</div>
+    <div class="kcard"><b>查看学生存档</b><div class="n">按学号</div>取证记录 / 节点进度 / 跑机结果 / 汇总稿，分组查看。</div>
+    <div class="kcard"><b>评分量规</b><div class="n">四维</div>权重构成，期末前可锁定。</div>
+    <div class="kcard"><b>抽样覆核 + 口试</b><div class="n">防作弊</div>防学生给自己打高分的机制。</div>
+  </div>
+  <p>此外，系统给每个学生生成 <b>提示词与交互存档</b>：学生可把过程导出成可迁移材料，交给豆包 / DeepSeek 也能接着用；教师可用它来做复核与口试提问。</p>
+  <div class="warn"><b>提醒：</b>教师端目前有两个页面是“好看的空壳”——「抽样覆核」与「量规配置」打开后不连接后端数据，教师无法真正复核、也无法调整权重。这是第六章排在第二位的亟待修复项。</div>
+</section>
+
+<!-- ============ 第四章 ============ -->
+<section id="ch4">
+  <div class="band">四、评分怎么算（不是 AI 说了算）
+    <small>教师定主量规，AI 不给最终分</small>
+  </div>
+  <h3 class="sub">四维评分构成</h3>
+  <table>
+    <thead><tr><th>维度</th><th>权重</th><th>看什么</th></tr></thead>
+    <tbody>
+      <tr><td><b>论证质量</b></td><td>40%</td><td>计划书内容本身站不站得住</td></tr>
+      <tr><td><b>过程留痕</b></td><td>30%</td><td>记录卡、反思、改写痕迹是否扎实</td></tr>
+      <tr><td><b>AI 协作决策</b></td><td>20%</td><td>启动金花得对症、决策理由成立、对 AI 产出有自己投入</td></tr>
+      <tr><td><b>表达</b></td><td>10%</td><td>成稿呈现</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><b>原则：</b>教师定主量规，AI 不给最终分；“分打给人做了什么判断，不打给 AI 产出多漂亮”。</div>
+
+  <h3 class="sub">五道反博弈闸门（防学生走捷径 / 给自己打高分）</h3>
+  <table>
+    <thead><tr><th>闸门</th><th>作用</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>闸门 1 · 低分无证据</b></td>
+        <td>评分≤2 必须附至少 10 字证据说明，否则评分无效</td>
+        <td><span class="pill on">已生效</span></td>
+      </tr>
+      <tr>
+        <td><b>闸门 2 · 教师抽样覆核</b></td>
+        <td>20% 的记录卡随机抽中，交教师复核</td>
+        <td><span class="pill on">已生效</span></td>
+      </tr>
+      <tr>
+        <td><b>闸门 3 · AI 退让上限</b></td>
+        <td>同一问题 AI 最多让步 2 次，防止“压分换顺从”</td>
+        <td><span class="pill soon">规则写好 · 待启用</span></td>
+      </tr>
+      <tr>
+        <td><b>闸门 4 · 改写率告警</b></td>
+        <td>照搬 AI 原文超过 30% 触发疑似复制告警</td>
+        <td><span class="pill soon">规则写好 · 待启用</span></td>
+      </tr>
+      <tr>
+        <td><b>闸门 5 · 口试抽查</b></td>
+        <td>系统按“决策理由薄弱 + 改写率低”提名口试候选人</td>
+        <td><span class="pill off">判定已打标 · 教师操作台空壳</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note-tech">说明：闸门 3、4 的判断函数已写好，但尚未接入主流程；闸门 5 的判定已写入跑机环节，但教师端没有可操作界面（属第六章 P1-5）。本说明如实标注，不夸大为“已全部生效”。</div>
+</section>
+
+<!-- ============ 第五章 ============ -->
+<section id="ch5">
+  <div class="band">五、学生过程数据存了什么（给教师的安心说明）
+    <small>系统存的不是一份最终稿，而是一串可追溯的过程证据</small>
+  </div>
+  <p>很多老师担心：“学生用 AI 写，我怎么知道是他自己想的？”本系统记录的是<b>过程</b>，不是一个交稿动作：</p>
+  <ol>
+    <li><b>取证材料库</b>：学生提交的一手证据原文（他到底去接触了谁、拿到了什么）。</li>
+    <li><b>承重节点决策档案</b>：每关怎么过的、证据是什么。</li>
+    <li><b>记录卡</b>：决策理由、薄弱点、对 AI 的评价。</li>
+    <li><b>跑机决策与结果</b>：4 回合每次的决策与冲击结果。</li>
+    <li><b>交互存档</b>：每轮对话生成的可迁移提示词 + 完整交互文档，<b>按版本保留、永不覆盖</b>——学生改十次，教师能看到每一次的来龙去脉。</li>
+  </ol>
+  <div class="ok">一句话：数据是<b>过程性</b>的，不是“交一份稿子就完事”。谁在真思考、谁在复制粘贴，留痕里看得见。</div>
+</section>
+
+<!-- ============ 第六章 ============ -->
+<section id="ch6">
+  <div class="band">六、未完成事项与风险（按“能不能上课用”排序）
+    <small>不按技术严重度，而按“最影响能不能发给学生用”排</small>
+  </div>
+
+  <div class="risk">
+    <div class="rank">1</div>
+    <div class="body">
+      <h4>【最急 · 发给学生就出事】无学号鉴权</h4>
+      <div class="why">为什么影响教学：全班共用一个身份，张三能看李四的取证记录、承重节点、计划书草稿。发给学生的第一天就会出事，学生信任一旦崩塌就没法上这门课。</div>
+      <div class="do">要做什么：登录页输入姓名 + 学号 → 后端按学号隔离；教师端按学号分组全班。不做密码（课堂够用），可选加班级口令防冒用。</div>
+    </div>
+  </div>
+
+  <div class="risk">
+    <div class="rank">2</div>
+    <div class="body">
+      <h4>【评分不可信】教师端“抽样覆核”“量规配置”是空壳</h4>
+      <div class="why">为什么影响教学：页面好看但不连接后端数据，教师无法真正复核、无法调整权重。没有教师复核，评分可信度塌掉，整个教学设计落不了地。</div>
+      <div class="do">要做什么：建抽样覆核接口（列出待覆核记录卡 → 教师通过/退回 → 写回）；建量规配置读写（四维权重与要点，期末前可锁定）。</div>
+    </div>
+  </div>
+
+  <div class="risk">
+    <div class="rank">3</div>
+    <div class="body">
+      <h4>【激励机制失效】券商店买完无任何产出</h4>
+      <div class="why">为什么影响教学：学生花启动金买了“寂寞”，过程分证据链断。5 张券本是学生“把钱花在哪”的决策证据，现在机制完全没有运行。</div>
+      <div class="do">要做什么：为 6 种券各自定义具体产出形态（检索增强 / 逻辑梳理 / PPT / 调研报告 / 模拟投资人 / 修复券），产出进入记录卡与汇总稿。</div>
+    </div>
+  </div>
+
+  <div class="risk">
+    <div class="rank">4</div>
+    <div class="body">
+      <h4>【全班上课必崩 + 数据全丢】AI 限流 + 数据库无自动备份</h4>
+      <div class="why">为什么影响教学：全班同时上课时，每人一轮对话要调 AI 2–3 次，40 人一节课 100+ 次调用，必然大面积失败；数据库无定时备份，库一挂这学期过程分全没，没有第二次机会。</div>
+      <div class="do">要做什么：备用密钥轮换 + 请求队列与退避重试；数据库每日定时备份到带时间戳目录、保留 30 天。</div>
+    </div>
+  </div>
+
+  <div class="risk">
+    <div class="rank">5</div>
+    <div class="body">
+      <h4>【体验断点】AI 学伴无“写入 BP”闭环</h4>
+      <div class="why">为什么影响教学：AI 在对话里给出可用段落，学生只能手动复制粘贴到计划书编辑器。手工复制会打断心流，学生多半懒得搬——于是 AI 产出进不了计划书，正是系统要对抗的病。</div>
+      <div class="do">要做什么：AI 回复加“采纳”按钮 → 选中段落写入计划书对应章节 → 采纳动作本身留痕进记录卡。</div>
+    </div>
+  </div>
+
+  <div class="risk">
+    <div class="rank">6</div>
+    <div class="body">
+      <h4>【防作弊缺口】口试模块建了未接线</h4>
+      <div class="why">为什么影响教学：口试是“过程留痕 30%”的兜底——书面留痕能被伪造，口试不能。设计里口试是闸门之一，但功能不存在。</div>
+      <div class="do">要做什么：抽样式生成口试题（从 4 次跑机决策理由里挑矛盾点）→ 教师现场问 → 录评分。依赖前两项修复。</div>
+    </div>
+  </div>
+
+  <h3 class="sub">已解决、不算痛点的 8 项（给教师信心）</h3>
+  <div class="ok">
+    <ul style="margin:0">
+      <li>数据总线已建：各模块统一读取学生状态</li>
+      <li>守门人定位已改：不答答案、派取证任务，实测有效</li>
+      <li>承重节点放行：5 节点实测能靠取证挣出来</li>
+      <li>BP 汇总闭环：实测生成 1941 字、8 章计划书草稿，投资人追问能抓出真实自相矛盾</li>
+      <li>提示词可迁移性：已验证从零能出完整计划书且不编造未走通的节点</li>
+      <li>交互存档版本化：多版只追加不覆盖，已验证</li>
+      <li>配色缺陷已修：深底配深字问题已修，有自动检测</li>
+      <li>服务器外网已通：安全组已开，线上可访问</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 第七章 ============ -->
+<section id="ch7">
+  <div class="band">七、方法论母本缺口（可选章）
+    <small>供任课教师了解演进方向，同行可不深究</small>
+  </div>
+  <p>当前 AI 守门靠“写得够不够具体”（有具体的人、具体的数字、具体的来源），但还没有接入成熟的创业框架（如商业模式画布）的<b>可计算判据</b>。下一阶段要补：</p>
+  <ul>
+    <li><b>单位经济模型</b>：客单价 × 频次 × 留存 → 毛利 → 减固定成本 → 盈亏平衡点。补上后，跑机 4 个月的结果能真正“算”出来，而不是由脚本写死结论。</li>
+    <li><b>每节点证据判据 + 反例库</b>：什么算“客户细分合格”、什么算“壁垒不成立”，给教师和学生可对照的标准。</li>
+  </ul>
+  <p>补完后，<b>老师教的、AI 拦的、量规评的会是同一套逻辑</b>——这是让系统真正立得住的关键一步。</p>
+</section>
+
+<!-- ============ 第八章 ============ -->
+<section id="ch8">
+  <div class="band">八、文档说明
+    <small>本版随系统更新，改动同步到对应章节</small>
+  </div>
+  <p>本说明与「系统架构（开发者版）」保持同步：任何教学功能改动，都会同时更新两份文档的对应章节。技术细节（部署、脚本、自动化配色校验等）只在开发者版中展开，不在此处占用篇幅。</p>
+  <div class="note-tech">术语约定：本版统一使用系统界面已有的教学语言（AI 学伴、承重节点、记录卡、跑机、闸门、量规、启动金等），不出现任何编程术语。闸门编号以系统源码为准（1 低分无证据 / 2 教师抽样覆核 / 3 AI 退让上限 / 4 改写率告警 / 5 口试抽查）。</div>
+</section>
+
+<footer>
+  bp-harness 教师版架构说明 · 文档版本 2026-10-31 · 与开发者版同步维护<br/>
+  本文件仅供教学研讨使用，所涉未完成项以线上实际版本为准。
+</footer>
+
+</div>
+</body>
+</html>

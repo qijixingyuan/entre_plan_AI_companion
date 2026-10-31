@@ -24,7 +24,8 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const TARGET = resolve(ROOT, "系统架构.html");
+const argTarget = process.argv[2];
+const TARGET = argTarget ? resolve(ROOT, argTarget) : resolve(ROOT, "系统架构.html");
 const SHOTS = resolve(ROOT, "shots");
 
 const FATAL = 3.0; // <3.0 致命（看不清）
@@ -237,10 +238,11 @@ async function main() {
   await page.waitForTimeout(400);
 
   // ---------- 出图 ----------
-  await page.screenshot({ path: resolve(SHOTS, "arch-full.png"), fullPage: true });
+  const base = (TARGET.replace(/\.html$/i, "").split(/[\\/]/).pop() || "arch");
+  await page.screenshot({ path: resolve(SHOTS, base + "-full.png"), fullPage: true });
   const svg = await page.$("svg");
-  if (svg) await svg.screenshot({ path: resolve(SHOTS, "arch-diagram.png") });
-  console.log("📸 已出图：shots/arch-full.png, shots/arch-diagram.png");
+  if (svg) await svg.screenshot({ path: resolve(SHOTS, base + "-diagram.png") });
+  console.log(`📸 已出图：shots/${base}-full.png, shots/${base}-diagram.png`);
 
   if (!shotOnly) {
     const h = await scanHTML(page);
