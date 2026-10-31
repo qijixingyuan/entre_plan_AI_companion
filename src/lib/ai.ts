@@ -6,7 +6,13 @@
  * 它懂方法论，但明确承认自己不掌握学生项目所处的具体市场与本地真实情况；
  * 因此它给的是「怎么去查」的路线，而不是「答案是什么」。
  * 学生必须从外部带回真实信息，AI 验证后才放行下一个承重节点。
+ *
+ * 2026-10-31 接入方法论母本：评价与回复时对照 src/lib/methodology/ 的具体判据、
+ * 标注出处，不再临场现编（详见 README.md 与 DEV-GUIDE 第十一章）。
  */
+
+import { DecisionNodeKey } from "@/lib/context";
+import { buildMethodologyInjection } from "@/lib/methodology/loader";
 
 const SYSTEM_PROMPT = `你是 AI 学伴，陪一位高职学生做《大学生创业计划书》。
 
@@ -37,6 +43,13 @@ const SYSTEM_PROMPT = `你是 AI 学伴，陪一位高职学生做《大学生�
 customer（目标客户）→ value_prop（价值主张）→ revenue（收入模式）→ metric（关键指标）→ moat（竞争壁垒）
 
 只在学生带回的证据真的撑得住时才放行，不因为他聊得久就放行。放行时把他的结论记进卡片。
+
+# 评价必须引用方法论母本（本提示下方已随附）
+你不是凭印象评判。每次评价学生证据是否成立、是否放行，必须：
+1. 对照「当前节点判据」里的「合格判据」逐条核验；
+2. 若命中「不合格反例」，点名是第几条（例如「命中反例②」）；
+3. 在正文（标记行之后）开头写一句【依据：<框架>·<节点>｜<出处>】，例如【依据：精益画布·目标客户｜Maurya 2010】；
+4. 禁止只说"太笼统""再具体点"这种空话，必须指出差在哪一条、对照了哪条标准。
 
 # 输出协议（严格遵守，否则前端无法解析）
 你的回复**第一行**必须是标记行，格式：
@@ -145,12 +158,19 @@ async function request(
   }
 }
 
-/** AI 学伴的守门人对话 */
-export async function callLLM(messages: ChatMessage[]): Promise<string> {
-  return request(SYSTEM_PROMPT, messages, 900);
+/** AI 学伴的守门人对话 —— 注入「当前节点」的判据（更准、更省 token） */
+export async function callLLM(
+  messages: ChatMessage[],
+  nodeKey?: DecisionNodeKey | null
+): Promise<string> {
+  const injected = await buildMethodologyInjection({ nodeKey: nodeKey ?? null, role: "gatekeeper" });
+  const sys = injected
+    ? `${SYSTEM_PROMPT}\n\n---\n\n# 方法论母本（评价与放行必须引用，禁止凭印象）\n${injected}`
+    : SYSTEM_PROMPT;
+  return request(sys, messages, 900);
 }
 
-/** 汇总阶段的模拟投资人视角 —— 只提问，不代写 */
+/** 汇总阶段的模拟投资人视角 —— 只提问，不代写（注入全部节点判据 + 单位经济模型） */
 const INVESTOR_SYSTEM = `你是模拟投资人，正在看一份高职学生的创业计划书初稿。
 
 铁律：**你只能使用下面素材里给出的事实，禁止新增任何数字、人名、机构名、市场数据。**
@@ -164,6 +184,10 @@ const INVESTOR_SYSTEM = `你是模拟投资人，正在看一份高职学生的�
 语气直接、不留情面，但说人话。`;
 
 export async function generateInvestorReview(factsMarkdown: string): Promise<string> {
+  const injected = await buildMethodologyInjection({ role: "investor" });
+  const sys = injected
+    ? `${INVESTOR_SYSTEM}\n\n---\n\n# 方法论母本（挑毛病必须对照以下合格判据与单位经济模型，并引用出处）\n${injected}`
+    : INVESTOR_SYSTEM;
   const prompt = `以下是这位学生计划书中的全部事实素材（来自他本人的取证记录与 4 个月度跑机回合的决策记录，没有别的了）：\n\n${factsMarkdown}`;
-  return request(INVESTOR_SYSTEM, [{ role: "user", content: prompt }], 700);
+  return request(sys, [{ role: "user", content: prompt }], 700);
 }

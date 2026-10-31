@@ -60,13 +60,18 @@ export async function POST(req: NextRequest) {
   }
   const studentText = content.trim();
 
-  // 历史上下文（只取最近 20 条）
-  const history: ChatMessage[] = (await loadContext()).aiMessages
+  // 历史上下文（只取最近 20 条）+ 推算当前待推进节点
+  const ctx = await loadContext();
+  const history: ChatMessage[] = ctx.aiMessages
     .slice(-20)
     .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
   history.push({ role: "user", content: studentText });
 
-  const raw = await callLLM(history);
+  // 当前要评估的节点 = 第一个尚未放行的承重节点（学生按顺序走，就是这个）
+  const currentNode = DECISION_NODES.find(
+    (n) => !ctx.decisions.some((d) => d.node === n.key)
+  );
+  const raw = await callLLM(history, currentNode?.key ?? null);
   const { body: replyBody, tag } = parseAITag(raw);
 
   const turnId = Date.now();
