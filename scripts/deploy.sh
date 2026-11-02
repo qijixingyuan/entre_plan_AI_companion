@@ -80,16 +80,29 @@ server_deploy() {
 
   blue "→ 冒烟测试"
   local ok=1
-  for p in / /student/chat /student/archives /teacher/dashboard; do
+  # 期望状态码：
+  #   200 = 直接可访问
+  #   307 = 未登录被重定向到 /login（学号鉴权上线后的正常表现，见 src/middleware.ts）
+  for p in / /login /student/chat /student/archives /teacher/dashboard; do
     local code
     code=$(ssh "$SERVER" "curl -s -o /dev/null -w '%{http_code}' --connect-timeout 5 http://127.0.0.1:$PORT$p" || echo 000)
-    if [ "$code" = "200" ]; then
-      printf "   ✓ %s\n" "$p"
+    if [ "$code" = "200" ] || [ "$code" = "307" ]; then
+      printf "   ✓ %s → %s\n" "$p" "$code"
     else
       printf "   ✗ %s → HTTP %s\n" "$p" "$code"
       ok=0
     fi
   done
+
+  # API 鉴权自检：未登录调用学生端 API 应返回 401（不是 200 也不是 500）
+  local api_code
+  api_code=$(ssh "$SERVER" "curl -s -o /dev/null -w '%{http_code}' --connect-timeout 5 http://127.0.0.1:$PORT/api/chat" || echo 000)
+  if [ "$api_code" = "401" ]; then
+    printf "   ✓ /api/chat（未登录）→ 401 鉴权生效\n"
+  else
+    printf "   ✗ /api/chat（未登录）→ HTTP %s（应为 401）\n" "$api_code"
+    ok=0
+  fi
 
   if [ "$ok" = "1" ]; then
     green "✓ 部署成功 — $commit"
