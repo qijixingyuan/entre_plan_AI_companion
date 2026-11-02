@@ -156,10 +156,8 @@ ssh luoyu 'export PATH=/www/server/nodejs/v20.18.0/bin:$PATH; cd /www/wwwroot/bp
 
 ## 九、当前未完成（按优先级）
 
-1. **学号登录鉴权**——现全班共用 `student-demo`，正式给学生用之前必须补。
-   存档表已按 `userId` 分组，接上鉴权后教师端自动按学生分开显示，接口无需改动。
-   替换点唯一：`src/lib/session.ts`（已标注「后续接鉴权时替换这里即可」）。
-   ⚠️ 改动面：19 个 API 路由中 13 个引用 `DEMO_USER_ID` / `DEMO_DOC_ID`。
+1. ~~学号登录鉴权~~ ✅ 学生端已完成（2026-11-02，姓名+学号无密码，签名 Cookie + 每生独立文档）。
+   ⚠️ **教师端鉴权仍待补**（`/teacher/*` 与 `/api/teacher/*` 当前无鉴权，middleware 明确放行）。
 2. ~~每日自动备份 crontab~~ ✅ 已完成（2026-11-02，`scripts/backup-db.sh`，crontab `17 3 * * *`）
 3. ~~API 限流应对~~ ✅ 已完成（2026-11-02，指数退避重试 + 多 key 轮换）
    ⚠️ 备用密钥仍需用户提供：设环境变量 `DASHSCOPE_API_KEY_BACKUP`（逗号分隔多把）
