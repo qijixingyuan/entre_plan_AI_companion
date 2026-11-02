@@ -149,7 +149,7 @@
       <span class="chip">Drizzle ORM 0.45 + better-sqlite3 13</span>
       <span class="chip">阿里百炼 DashScope · deepseek-v4-pro</span>
       <span class="chip">版本 v0.1.0</span>
-      <span class="chip">文档版本 2026-11-02（限流退避+每日备份）</span>
+      <span class="chip">文档版本 2026-11-02（学号鉴权+限流备份）</span>
       <span class="chip">数据来源：源码实扫</span>
     </div>
   </div>
@@ -158,12 +158,12 @@
 <div class="wrap">
 
   <div class="kpis">
-    <div class="kpi"><div class="n">13</div><div class="l">前端页面 page.tsx</div><div class="s">学生 7 · 教师 5 · 入口 1</div></div>
-    <div class="kpi"><div class="n">19</div><div class="l">API 路由 route.ts</div><div class="s">学生 14 · 教师 5</div></div>
+    <div class="kpi"><div class="n">14</div><div class="l">前端页面 page.tsx</div><div class="s">学生 7 · 教师 5 · 入口 1 · 登录 1</div></div>
+    <div class="kpi"><div class="n">21</div><div class="l">API 路由 route.ts</div><div class="s">学生 14 · 教师 5 · 鉴权 2</div></div>
     <div class="kpi"><div class="n">20</div><div class="l">数据表 sqliteTable</div><div class="s">6 个业务域</div></div>
     <div class="kpi"><div class="n">6</div><div class="l">领域模块 src/lib</div><div class="s">1672 行核心逻辑</div></div>
     <div class="kpi"><div class="n">5 + 4</div><div class="l">承重节点 + 跑机回合</div><div class="s">双门禁后方可生成 BP</div></div>
-    <div class="kpi"><div class="n">9</div><div class="l">运维脚本 scripts/</div><div class="s">含部署 / 对比度检测</div></div>
+    <div class="kpi"><div class="n">10</div><div class="l">运维脚本 scripts/</div><div class="s">含部署 / 备份 / 对比度检测</div></div>
   </div>
 
   <!-- ============ 架构图 ============ -->
@@ -196,7 +196,7 @@
       <rect x="40" y="16" width="1280" height="126" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
       <text x="56" y="38" font-size="13" font-weight="700" fill="#1e3a8a">L1 接入层</text>
       <text x="56" y="56" font-size="11" fill="#475569">页面</text>
-      <text x="56" y="72" font-size="11" fill="#475569">13 个</text>
+      <text x="56" y="72" font-size="11" fill="#475569">14 个</text>
 
       <!-- 学生端 -->
       <rect x="110" y="30" width="430" height="98" rx="9" fill="#ffffff" stroke="#93c5fd"/>
@@ -234,7 +234,7 @@
       <text x="980" y="47" font-size="11.5" font-weight="700" fill="#1e40af">入口与布局</text>
       <g font-size="10.5" fill="#334155">
         <rect x="978" y="54" width="150" height="30" rx="6" fill="#f8fafc" stroke="#cbd5e1"/><text x="1053" y="68" text-anchor="middle" font-weight="600">落地页</text><text x="1053" y="79" text-anchor="middle" font-size="9" fill="#64748b">src/app/page.tsx</text>
-        <rect x="1136" y="54" width="162" height="30" rx="6" fill="#f8fafc" stroke="#cbd5e1"/><text x="1217" y="68" text-anchor="middle" font-weight="600">侧边栏（w-60）</text><text x="1217" y="79" text-anchor="middle" font-size="9" fill="#64748b">ml-60 主区偏移</text>
+        <rect x="1136" y="54" width="162" height="30" rx="6" fill="#ecfdf5" stroke="#6ee7b7"/><text x="1217" y="68" text-anchor="middle" font-weight="700" fill="#065f46">学号登录</text><text x="1217" y="79" text-anchor="middle" font-size="9" fill="#047857">/login · P0-3 已修</text>
       </g>
       <rect x="978" y="90" width="320" height="30" rx="6" fill="#fff7ed" stroke="#fdba74"/>
       <text x="1138" y="104" text-anchor="middle" font-size="9.5" font-weight="700" fill="#b45309">配色铁律：深色底必须配浅色字（text-white / text-*-100~300）</text>
@@ -250,7 +250,7 @@
       <text x="56" y="198" font-size="13" font-weight="700" fill="#312e81">L2 应用层</text>
       <text x="56" y="216" font-size="11" fill="#475569">Route</text>
       <text x="56" y="232" font-size="11" fill="#475569">Handler</text>
-      <text x="56" y="248" font-size="11" fill="#475569">19 个</text>
+      <text x="56" y="248" font-size="11" fill="#475569">21 个</text>
 
       <!-- C1 -->
       <rect x="110" y="190" width="390" height="76" rx="9" fill="#ffffff" stroke="#a5b4fc"/>
@@ -308,6 +308,10 @@
         <text x="930" y="308" font-family="ui-monospace,Menlo,monospace">GET</text><text x="996" y="308">/teacher/archives/[id]/download</text>
         <text x="930" y="326" font-size="9.5" fill="#64748b">教师可见全班学生存档</text>
         <text x="930" y="336" font-size="9" font-weight="700" fill="#b91c1c">⚠ 闸门 2（20% 抽检）落库后无人查看；量规无处录入</text>
+        <text x="1148" y="289" font-size="11" font-weight="700" fill="#065f46">鉴权 · 2 路由</text>
+        <text x="1148" y="308" font-family="ui-monospace,Menlo,monospace" font-size="10">GET/POST</text><text x="1210" y="308">/auth/login</text>
+        <text x="1148" y="326" font-family="ui-monospace,Menlo,monospace" font-size="10">POST</text><text x="1210" y="326">/auth/logout</text>
+        <text x="1148" y="336" font-size="9" font-weight="700" fill="#047857">P0-3 已修 · 签名 Cookie</text>
       </g>
 
       <!-- L2→L3 -->
@@ -363,12 +367,12 @@
         <text x="946" y="477" font-size="9" fill="#5b21b6">83 行 · 应用层强制</text>
       </g>
       <g>
-        <rect x="1124" y="400" width="184" height="84" rx="9" fill="#ffffff" stroke="#fca5a5"/>
-        <text x="1136" y="417" font-size="11.5" font-weight="700" fill="#b91c1c">session.ts · 会话</text>
-        <text x="1136" y="433" font-size="10" fill="#475569">DEMO_USER_ID = student-demo</text>
-        <text x="1136" y="447" font-size="10" fill="#475569">DEMO_DOC_ID = doc-demo-opp</text>
+        <rect x="1124" y="400" width="184" height="84" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+        <text x="1136" y="417" font-size="11.5" font-weight="700" fill="#065f46">session.ts · 会话</text>
+        <text x="1136" y="433" font-size="10" fill="#475569">签名 Cookie（HMAC 校验）</text>
+        <text x="1136" y="447" font-size="10" fill="#475569">按学号建档 · 每人独立文档</text>
         <text x="1136" y="461" font-size="10" fill="#475569">积分账户（初始 5 券）</text>
-        <text x="1136" y="477" font-size="9" font-weight="700" fill="#b91c1c">P0-3 无学号鉴权，全班共用</text>
+        <text x="1136" y="477" font-size="9" font-weight="700" fill="#047857">P0-3 已修 · 2026-11-02</text>
       </g>
 
       <!-- L3→L4 -->
@@ -461,15 +465,15 @@
       <text x="146" y="828" font-size="11.5" font-weight="700" fill="#b45309">阿里百炼 DashScope</text>
       <text x="122" y="845" font-size="10" fill="#475569">模型 deepseek-v4-pro（百炼专属端点）</text>
       <text x="122" y="860" font-size="10" fill="#475569">仅 ai.ts 调用 · 环境变量注入，不落库</text>
-      <text x="122" y="877" font-size="9.5" font-weight="700" fill="#b45309">P1-6 短时连续调用触发 429，无退避重试</text>
+      <text x="122" y="877" font-size="9.5" font-weight="700" fill="#047857">P1-6 已修：429 指数退避重试 + 多密钥轮换</text>
 
       <!-- 脚本 -->
       <rect x="516" y="810" width="390" height="84" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
-      <text x="528" y="828" font-size="11.5" font-weight="700" fill="#334155">脚本层 scripts/ · 9</text>
+      <text x="528" y="828" font-size="11.5" font-weight="700" fill="#334155">脚本层 scripts/ · 10</text>
       <g font-size="9.5" fill="#475569" font-family="ui-monospace,Menlo,monospace">
         <text x="530" y="845">init-db · bootstrap-demo · seed-events-changsha</text>
         <text x="530" y="860">manual-to-html · list-models · test-prompt-portability</text>
-        <text x="530" y="875" font-weight="700" fill="#b45309">deploy.sh（deploy/rollback/status）· check-contrast.mjs</text>
+        <text x="530" y="875" font-weight="700" fill="#b45309">deploy.sh · backup-db.sh（每日备份）· check-contrast.mjs</text>
       </g>
 
       <!-- 部署 -->
@@ -575,7 +579,8 @@
           <thead><tr><th style="width:190px">页面</th><th>职责</th><th style="width:280px">调用的 API</th></tr></thead>
           <tbody>
             <tr><td><code>/</code></td><td>落地页，选择进入学生端或教师端</td><td>无</td></tr>
-            <tr><td><code>/student/home</code></td><td>欢迎区 + 模块进度总览（节点数、回合数、券余额）</td><td>/api/nodes, /api/coupons, /api/records/completion</td></tr>
+            <tr><td><code>/login</code></td><td><b>学号登录页</b>（姓名 + 学号，无密码）；签发签名 Cookie</td><td>GET/POST /api/auth/login</td></tr>
+            <tr><td><code>/student/home</code></td><td>欢迎区（显示真实姓名/学号 + 退出登录）+ 模块进度总览（节点数、回合数、券余额）</td><td>/api/nodes, /api/coupons, /api/records/completion, /api/auth/login</td></tr>
             <tr><td><code>/student/chat</code></td><td>AI 学伴主界面，顶部一行显示 5 节点放行进度</td><td>GET/POST/DELETE /api/chat</td></tr>
             <tr><td><code>/student/records</code></td><td>记录卡完成度检查台，缺哪项直接给跳转按钮</td><td>GET/POST /api/records</td></tr>
             <tr><td><code>/student/sim</code></td><td>BP 跑机，4 回合限时决策（120 秒）</td><td>GET /api/sim, POST /api/sim/decide</td></tr>
@@ -593,7 +598,7 @@
     </details>
 
     <details>
-      <summary>L2 应用层 · 19 个路由清单</summary>
+      <summary>L2 应用层 · 21 个路由清单</summary>
       <div class="det-body">
         <table>
           <thead><tr><th style="width:260px">路由</th><th style="width:80px">方法</th><th>说明</th></tr></thead>
@@ -614,6 +619,8 @@
             <tr><td><code>/api/archives</code></td><td><span class="tag get">GET</span> <span class="tag post">POST</span></td><td>存档列表 / 生成新版本</td></tr>
             <tr><td><code>/api/archives/[id]</code></td><td><span class="tag get">GET</span></td><td>存档详情（含 promptMd / transcriptMd）</td></tr>
             <tr><td><code>/api/archives/[id]/download</code></td><td><span class="tag get">GET</span></td><td>下载存档文档</td></tr>
+            <tr><td><code>/api/auth/login</code></td><td><span class="tag get">GET</span> <span class="tag post">POST</span></td><td><b>学号登录</b>：GET 查当前身份 / POST 签发签名 Cookie（<b>P0-3</b>）</td></tr>
+            <tr><td><code>/api/auth/logout</code></td><td><span class="tag post">POST</span></td><td>退出登录，清会话 Cookie（<b>P0-3</b>）</td></tr>
             <tr><td><code>/api/teacher/stats</code></td><td><span class="tag get">GET</span></td><td>班级统计</td></tr>
             <tr><td><code>/api/teacher/reset</code></td><td><span class="tag post">POST</span></td><td>重置学生数据</td></tr>
             <tr><td><code>/api/teacher/archives</code></td><td><span class="tag get">GET</span></td><td>全班学生存档列表</td></tr>
@@ -635,7 +642,7 @@
             <tr><td><code>bp-compose.ts</code></td><td>把学生真实记录组装成 8 章计划书，不新增任何事实</td><td><code>composeFacts()</code> / <code>composeBpMarkdown()</code></td></tr>
             <tr><td><code>archive-compose.ts</code></td><td>生成可迁移到豆包/DeepSeek 的提示词 + 完整交互文档</td><td><code>composeTransferPrompt()</code> / <code>composeTranscript()</code></td></tr>
             <tr><td><code>guards.ts</code></td><td>5 道反博弈闸门，应用层强制执行</td><td>退让上限 2、改写率阈值 0.3、抽检率 0.2、自提策略系数 1.2</td></tr>
-            <tr><td><code>session.ts</code></td><td>演示用户/文档常量与积分账户</td><td><code>DEMO_USER_ID</code> / <code>DEMO_DOC_ID</code> / <code>getOrCreateCreditAccount()</code></td></tr>
+            <tr><td><code>session.ts</code></td><td><b>学号鉴权</b>：签名 Cookie 签发/校验、按学号建档、每人独立文档；另保留演示用户常量供教师端用</td><td><code>createSessionToken()</code> / <code>verifySessionToken()</code> / <code>getSessionIds()</code> / <code>getOrCreateDocForUser()</code>；密钥存 <code>data/.session-secret</code></td></tr>
           </tbody>
         </table>
         <ul>
@@ -740,10 +747,10 @@
       <div class="fix"><b>修法：</b>接入 <code>/api/teacher/stats</code> 与新增「覆核队列 / 量规录入」两条 API，让闸门 2 与评分维度真正闭合。</div>
     </div>
 
-    <div class="gap">
-      <h4>P0-3　无学号鉴权，全班共用 student-demo<span class="meta">🔴 P0</span></h4>
-      <p><code>session.ts</code> 中 <code>DEMO_USER_ID = "student-demo"</code> 硬编码，所有学生读写同一份文档与存档。正式给学生用之前必须做。</p>
-      <div class="fix"><b>修法：</b>引入学号登录，<code>getCurrentUser()</code> 改为按会话解析；该文件已标注「后续接鉴权时替换这里即可」，替换点唯一。</div>
+    <div class="gap" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
+      <h4 style="color:var(--ok)">P0-3　无学号鉴权，全班共用 student-demo<span class="meta" style="color:var(--ok)">✅ 已修复 2026-11-02</span></h4>
+      <p><b>原症状：</b><code>session.ts</code> 中 <code>DEMO_USER_ID = "student-demo"</code> 硬编码，所有学生读写同一份文档与存档。张三能看到李四的取证记录、承重节点、BP 草稿、存档——发给学生的第一天就出事。</p>
+      <div class="fix"><b>修法（已落地）：</b>① <code>session.ts</code> 改为签名会话：HMAC-SHA256 签名 Cookie（<code>base64url(userId|exp).hmac</code>），密钥存 <code>data/.session-secret</code> 自动生成（<b>绝不能用公开常量</b>，否则谁都能伪造 Cookie 冒充同学）；② 新增 <code>/login</code> 页面 + <code>/api/auth/login|logout</code>，学号为唯一标识，同号复登复用同一账号；③ <b>每人一份独立文档</b>（<code>bp_documents.id = doc-u-&lt;userId&gt;</code>），所有下游表按 <code>doc_id</code> 过滤，隔离自动成立；④ 11 个学生端 API 路由 + <code>loadContext()</code> 全部改走 <code>getSessionIds()</code>；⑤ 新增 <code>src/middleware.ts</code> 守卫，未登录拦到登录页、API 返回 401。<b>教师端本轮不做鉴权</b>（用户拍板先做学生端），且 <code>/api/teacher/archives</code> 已能列出全部登录学生。</div>
     </div>
 
     <div class="gap">
@@ -766,7 +773,7 @@
 
     <div class="callout">
       <b>推进顺序与进度：</b>P0-3 鉴权 + P1-6 备份（保命与开门）→ P0-2 教师端接线（含 P1-5 口试）→ P1-4 AI 写 BP → P0-1 券产出。
-      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ⏳ P0-3 鉴权进行中。
+      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· ⏳ P0-2 教师端接线进行中。
     </div>
   </section>
 
