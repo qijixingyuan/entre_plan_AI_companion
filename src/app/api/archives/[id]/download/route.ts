@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db, schema } from "@/db";
 import { eq, and } from "drizzle-orm";
-import { DEMO_USER_ID, DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 
 /**
  * GET /api/archives/[id]/download?kind=prompt|transcript|both
@@ -14,6 +14,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { userId, docId } = await getSessionIds();
   const { id } = await params;
   const kind = req.nextUrl.searchParams.get("kind") ?? "both";
 
@@ -23,8 +24,8 @@ export async function GET(
     .where(
       and(
         eq(schema.chatArchives.id, id),
-        eq(schema.chatArchives.userId, DEMO_USER_ID),
-        eq(schema.chatArchives.docId, DEMO_DOC_ID)
+        eq(schema.chatArchives.userId, userId),
+        eq(schema.chatArchives.docId, docId)
       )
     )
     .limit(1);

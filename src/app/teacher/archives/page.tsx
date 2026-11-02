@@ -40,7 +40,7 @@ interface Detail extends ArchiveRow {
 export default function TeacherArchivesPage() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [totalArchives, setTotalArchives] = useState(0);
-  const [singleUserMode, setSingleUserMode] = useState(false);
+  const [loggedInStudents, setLoggedInStudents] = useState(0);
   const [active, setActive] = useState<Detail | null>(null);
   const [tab, setTab] = useState<"prompt" | "transcript">("prompt");
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,7 @@ export default function TeacherArchivesPage() {
     if (json.ok) {
       setGroups(json.data.groups);
       setTotalArchives(json.data.totalArchives);
-      setSingleUserMode(json.data.singleUserMode);
+      setLoggedInStudents(json.data.loggedInStudents ?? 0);
     }
     setLoading(false);
   }, []);
@@ -83,11 +83,10 @@ export default function TeacherArchivesPage() {
         subtitle="每个学生与 AI 学伴的完整交互过程，以及可迁移到其他 AI 的提示词。"
       />
 
-      {singleUserMode && (
-        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800">
-          ⚠️ 当前是单用户演示模式（全班共用 student-demo 一个身份），
-          所以这里只会显示一份存档。等学号鉴权上线后，每位学生的存档会自动分开显示，
-          本页无需改动。
+      {loggedInStudents > 0 && (
+        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm text-emerald-800">
+          ✅ 学号鉴权已上线（2026-11-02）。当前有 <b>{loggedInStudents}</b> 位学生用学号登录，
+          存档按学号自动分开显示——每位学生只看得到自己的记录，同班同学也看不到。
         </div>
       )}
 

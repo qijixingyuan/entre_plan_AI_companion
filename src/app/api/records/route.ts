@@ -1,21 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, desc } from "drizzle-orm";
-import { DEMO_USER_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 import { checkLowScoreEvidence, shouldTeacherReview } from "@/lib/guards";
 
 /** GET /api/records — 列出记录卡 */
 export async function GET() {
+  const { userId } = await getSessionIds();
   const rows = await db
     .select()
     .from(schema.recordCards)
-    .where(eq(schema.recordCards.userId, DEMO_USER_ID))
+    .where(eq(schema.recordCards.userId, userId))
     .orderBy(desc(schema.recordCards.createdAt));
   return NextResponse.json({ ok: true, data: rows });
 }
 
 /** POST /api/records — 新建记录卡（含闸门 1 校验） */
 export async function POST(req: NextRequest) {
+  const { userId } = await getSessionIds();
   const body = await req.json();
   const { sourceType, sourceId, rating, reflection, rubricSignal } = body;
 
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
 
   await db.insert(schema.recordCards).values({
     id,
-    userId: DEMO_USER_ID,
+    userId: userId,
     turnId,
     sourceType,
     sourceId: sourceId || "manual",
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
   if (shouldTeacherReview()) {
     await db.insert(schema.guardFlags).values({
       id: `gf-${Date.now()}`,
-      userId: DEMO_USER_ID,
+      userId: userId,
       gate: "teacher_review",
       sourceTable: "record_cards",
       sourceId: id,
@@ -67,7 +69,7 @@ export async function POST(req: NextRequest) {
   const rows = await db
     .select()
     .from(schema.recordCards)
-    .where(eq(schema.recordCards.userId, DEMO_USER_ID))
+    .where(eq(schema.recordCards.userId, userId))
     .orderBy(desc(schema.recordCards.createdAt));
 
   return NextResponse.json({ ok: true, data: rows });

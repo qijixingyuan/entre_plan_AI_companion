@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Progress {
   decisions: number;
@@ -11,18 +12,21 @@ interface Progress {
 }
 
 export default function StudentHome() {
+  const router = useRouter();
   const [progress, setProgress] = useState<Progress>({
     decisions: 0, records: 0, balance: 5, simDone: 0, bpWords: 0,
   });
+  const [me, setMe] = useState<{ name: string; studentNo: string | null } | null>(null);
 
   useEffect(() => {
     async function load() {
-      const [d, r, c, s, b] = await Promise.all([
+      const [d, r, c, s, b, who] = await Promise.all([
         fetch("/api/decisions").then((r) => r.json()),
         fetch("/api/records").then((r) => r.json()),
         fetch("/api/coupons").then((r) => r.json()),
         fetch("/api/sim").then((r) => r.json()),
         fetch("/api/bp").then((r) => r.json()),
+        fetch("/api/auth/login").then((r) => r.json()),
       ]);
       setProgress({
         decisions: d.data?.length ?? 0,
@@ -31,9 +35,18 @@ export default function StudentHome() {
         simDone: (s.data?.rounds ?? []).filter((x: { status: string }) => x.status === "settled").length,
         bpWords: ((b.data?.document?.contentMd as string) || "").replace(/\s/g, "").length,
       });
+      if (who.data?.loggedIn) {
+        setMe({ name: who.data.name ?? "", studentNo: who.data.studentNo ?? null });
+      }
     }
     load();
   }, []);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
 
   const steps = [
     {
@@ -87,10 +100,25 @@ export default function StudentHome() {
     <div className="px-8 py-8">
       {/* 欢迎区 */}
       <div className="mb-8 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-10 text-white">
-        <h1 className="text-2xl font-bold">欢迎回来，演示学生</h1>
-        <p className="mt-2 text-blue-100 text-sm">
-          当前模块：<strong>机会识别</strong> · 你要做的是发现一个值得解决的问题，并证明它值得被解决。
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">
+              欢迎回来{me?.name ? `，${me.name}` : ""}
+            </h1>
+            <p className="mt-2 text-blue-100 text-sm">
+              当前模块：<strong>机会识别</strong> · 你要做的是发现一个值得解决的问题，并证明它值得被解决。
+            </p>
+            {me?.studentNo ? (
+              <p className="mt-1 text-blue-200 text-xs">学号 {me.studentNo} · 你的记录只有你自己能看到</p>
+            ) : null}
+          </div>
+          <button
+            onClick={logout}
+            className="shrink-0 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-medium backdrop-blur hover:bg-white/30 transition"
+          >
+            退出登录
+          </button>
+        </div>
         <div className="mt-5 flex gap-3">
           <Link
             href="/student/chat"

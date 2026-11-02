@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, and } from "drizzle-orm";
-import { DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 
 /** GET /api/decisions — 列出承重决策卡 */
 export async function GET() {
+  const { docId } = await getSessionIds();
   const rows = await db
     .select()
     .from(schema.loadBearingDecisions)
-    .where(eq(schema.loadBearingDecisions.docId, DEMO_DOC_ID));
+    .where(eq(schema.loadBearingDecisions.docId, docId));
   return NextResponse.json({ ok: true, data: rows });
 }
 
 /** POST /api/decisions — 保存/更新一张承重决策卡 */
 export async function POST(req: NextRequest) {
+  const { docId } = await getSessionIds();
   const body = await req.json();
   const { node, commitment, evidence, confidence } = body;
 
@@ -35,7 +37,7 @@ export async function POST(req: NextRequest) {
     .from(schema.loadBearingDecisions)
     .where(
       and(
-        eq(schema.loadBearingDecisions.docId, DEMO_DOC_ID),
+        eq(schema.loadBearingDecisions.docId, docId),
         eq(schema.loadBearingDecisions.node, node)
       )
     )
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
   } else {
     await db.insert(schema.loadBearingDecisions).values({
       id: `lbd-${Date.now()}-${node}`,
-      docId: DEMO_DOC_ID,
+      docId: docId,
       node,
       commitment: commitment.trim(),
       evidence: evidence || null,
@@ -66,7 +68,7 @@ export async function POST(req: NextRequest) {
   const rows = await db
     .select()
     .from(schema.loadBearingDecisions)
-    .where(eq(schema.loadBearingDecisions.docId, DEMO_DOC_ID));
+    .where(eq(schema.loadBearingDecisions.docId, docId));
 
   return NextResponse.json({ ok: true, data: rows });
 }

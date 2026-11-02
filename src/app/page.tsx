@@ -15,13 +15,13 @@ export default function Home() {
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
-            href="/student/home"
+            href="/login"
             className="rounded-2xl border-2 border-blue-200 bg-blue-50/50 px-8 py-10 text-left hover:border-blue-400 hover:shadow-md transition"
           >
             <div className="text-2xl">🎓</div>
             <div className="mt-3 text-lg font-semibold text-blue-900">学生端</div>
             <p className="mt-1 text-sm text-blue-700">
-              决策卡 → AI 认知伙伴 → BP 写作 → 跑机检验
+              输入姓名与学号进入 · 决策卡 → AI 认知伙伴 → BP 写作 → 跑机检验
             </p>
             <div className="mt-4 text-xs text-blue-600">进入学习 →</div>
           </Link>

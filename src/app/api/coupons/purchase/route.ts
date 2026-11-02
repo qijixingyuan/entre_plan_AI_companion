@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, and, count } from "drizzle-orm";
 import {
-  DEMO_USER_ID,
+  getSessionIds,
   DEFAULT_MODULE_ID,
   getOrCreateCreditAccount,
 } from "@/lib/session";
 
 /** POST /api/coupons/purchase — 购买券（含限购/余额/理由校验） */
 export async function POST(req: NextRequest) {
+  const { userId } = await getSessionIds();
   const body = await req.json();
   const { couponCode, reason } = body;
 
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 查账户
-  const account = await getOrCreateCreditAccount();
+  const account = await getOrCreateCreditAccount(userId, DEFAULT_MODULE_ID);
 
   // 余额检查
   if (account.balance < def.price) {
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
     .from(schema.creditLedger)
     .where(
       and(
-        eq(schema.creditLedger.userId, DEMO_USER_ID),
+        eq(schema.creditLedger.userId, userId),
         eq(schema.creditLedger.moduleId, DEFAULT_MODULE_ID),
         eq(schema.creditLedger.couponCode, couponCode)
       )
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
   const ledgerId = `cl-${Date.now()}`;
   await db.insert(schema.creditLedger).values({
     id: ledgerId,
-    userId: DEMO_USER_ID,
+    userId: userId,
     moduleId: DEFAULT_MODULE_ID,
     couponCode,
     reason: reason.trim(),
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
     .set({ balance: account.balance - def.price })
     .where(
       and(
-        eq(schema.creditAccounts.userId, DEMO_USER_ID),
+        eq(schema.creditAccounts.userId, userId),
         eq(schema.creditAccounts.moduleId, DEFAULT_MODULE_ID)
       )
     );

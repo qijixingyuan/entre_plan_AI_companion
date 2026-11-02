@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { callLLM, parseAITag, ChatMessage } from "@/lib/ai";
 import { db, schema } from "@/db";
 import { eq, and } from "drizzle-orm";
-import { DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 import { loadContext, DECISION_NODES, type DecisionNodeKey } from "@/lib/context";
 import { checkSequenceGate, checkCustomerEvidenceGate } from "@/lib/guards";
 
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   await db.insert(schema.aiMessages).values([
     {
       id: `msg-u-${turnId}`,
-      docId: DEMO_DOC_ID,
+      docId: ctx.docId,
       turnId,
       role: "user",
       content: studentText,
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     },
     {
       id: `msg-a-${turnId}`,
-      docId: DEMO_DOC_ID,
+      docId: ctx.docId,
       turnId,
       role: "assistant",
       content: assistantRaw,
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
       .from(schema.loadBearingDecisions)
       .where(
         and(
-          eq(schema.loadBearingDecisions.docId, DEMO_DOC_ID),
+          eq(schema.loadBearingDecisions.docId, ctx.docId),
           eq(schema.loadBearingDecisions.node, effectiveUnlock)
         )
       )
@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
     } else {
       await db.insert(schema.loadBearingDecisions).values({
         id: `lbd-${turnId}-${effectiveUnlock}`,
-        docId: DEMO_DOC_ID,
+        docId: ctx.docId,
         node: effectiveUnlock,
         commitment: commit,
         evidence: studentText.slice(0, 500),
@@ -190,6 +190,7 @@ export async function POST(req: NextRequest) {
 
 /** DELETE /api/chat — 清空对话（学生端「换个项目重新开始」） */
 export async function DELETE() {
-  await db.delete(schema.aiMessages).where(eq(schema.aiMessages.docId, DEMO_DOC_ID));
+  const { docId } = await getSessionIds();
+  await db.delete(schema.aiMessages).where(eq(schema.aiMessages.docId, docId));
   return NextResponse.json({ ok: true });
 }

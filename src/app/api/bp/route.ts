@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, desc } from "drizzle-orm";
-import { DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 import { calcChangeRate } from "@/lib/guards";
 
 /** GET /api/bp — 获取 BP 文档 */
 export async function GET() {
+  const { docId } = await getSessionIds();
   const rows = await db
     .select()
     .from(schema.bpDocuments)
-    .where(eq(schema.bpDocuments.id, DEMO_DOC_ID))
+    .where(eq(schema.bpDocuments.id, docId))
     .limit(1);
 
   const revisions = await db
     .select()
     .from(schema.bpRevisions)
-    .where(eq(schema.bpRevisions.docId, DEMO_DOC_ID))
+    .where(eq(schema.bpRevisions.docId, docId))
     .orderBy(desc(schema.bpRevisions.createdAt))
     .limit(10);
 
@@ -27,6 +28,7 @@ export async function GET() {
 
 /** PUT /api/bp — 保存 BP 文档（含修订记录） */
 export async function PUT(req: NextRequest) {
+  const { docId } = await getSessionIds();
   const body = await req.json();
   const { contentMd, trigger = "manual" } = body;
 
@@ -37,7 +39,7 @@ export async function PUT(req: NextRequest) {
   const existing = await db
     .select()
     .from(schema.bpDocuments)
-    .where(eq(schema.bpDocuments.id, DEMO_DOC_ID))
+    .where(eq(schema.bpDocuments.id, docId))
     .limit(1);
   const oldContent = existing[0]?.contentMd || "";
 
@@ -46,7 +48,7 @@ export async function PUT(req: NextRequest) {
     const changeRate = calcChangeRate(oldContent, contentMd);
     await db.insert(schema.bpRevisions).values({
       id: `rev-${Date.now()}`,
-      docId: DEMO_DOC_ID,
+      docId: docId,
       trigger,
       beforeMd: oldContent.slice(0, 5000),
       afterMd: contentMd.slice(0, 5000),
@@ -61,7 +63,7 @@ export async function PUT(req: NextRequest) {
         updatedAt: new Date().toISOString(),
         version: (existing[0]?.version ?? 1) + 1,
       })
-      .where(eq(schema.bpDocuments.id, DEMO_DOC_ID));
+      .where(eq(schema.bpDocuments.id, docId));
   }
 
   return NextResponse.json({ ok: true });

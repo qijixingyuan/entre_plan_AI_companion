@@ -7,7 +7,7 @@
  */
 import { db, schema } from "@/db";
 import { eq, and, desc, asc, inArray } from "drizzle-orm";
-import { DEMO_USER_ID, DEMO_DOC_ID } from "@/lib/session";
+import { DEMO_USER_ID, DEMO_DOC_ID, getSessionUserId, getOrCreateDocForUser } from "@/lib/session";
 
 /** 5 个承重节点 —— 全系统共用这一份定义（决策卡 / AI / 跑机 / BP 生成） */
 export const DECISION_NODES = [
@@ -114,38 +114,59 @@ export interface StudentContext {
   couponOutputs: { couponCode: string; outputId: string | null; createdAt: string }[];
 }
 
-/** 读取学生全量上下文 */
+/**
+ * 读取学生全量上下文
+ *
+ * 2026-11-02（P0-3 学号鉴权）：userId / docId 不再默认演示账号。
+ * 零参调用时自动按登录会话解析（学生端各 API 路由都走这条路）；
+ * 教师端与演示场景可显式传参。
+ */
 export async function loadContext(
-  userId = DEMO_USER_ID,
-  docId = DEMO_DOC_ID
+  userId?: string,
+  docId?: string
 ): Promise<StudentContext> {
+  let uid = userId;
+  let did = docId;
+
+  if (!uid || !did) {
+    const sessionUserId = await getSessionUserId();
+    if (sessionUserId) {
+      uid = uid ?? sessionUserId;
+      did = did ?? (await getOrCreateDocForUser(sessionUserId));
+    } else {
+      // 无会话：退回演示账号（教师端/演示模式），学生端 API 由 middleware 拦截
+      uid = uid ?? DEMO_USER_ID;
+      did = did ?? DEMO_DOC_ID;
+    }
+  }
+
   const [decisionRows, docRows, msgRows, recordRows, roundRows, acctRows, ledgerRows, userRows] =
     await Promise.all([
-      db.select().from(schema.loadBearingDecisions).where(eq(schema.loadBearingDecisions.docId, docId)),
-      db.select().from(schema.bpDocuments).where(eq(schema.bpDocuments.id, docId)).limit(1),
+      db.select().from(schema.loadBearingDecisions).where(eq(schema.loadBearingDecisions.docId, did)),
+      db.select().from(schema.bpDocuments).where(eq(schema.bpDocuments.id, did)).limit(1),
       db
         .select()
         .from(schema.aiMessages)
-        .where(eq(schema.aiMessages.docId, docId))
+        .where(eq(schema.aiMessages.docId, did))
         .orderBy(asc(schema.aiMessages.createdAt))
         .limit(100),
       db
         .select()
         .from(schema.recordCards)
-        .where(eq(schema.recordCards.userId, userId))
+        .where(eq(schema.recordCards.userId, uid))
         .orderBy(desc(schema.recordCards.createdAt)),
       db
         .select()
         .from(schema.simRounds)
-        .where(eq(schema.simRounds.docId, docId))
+        .where(eq(schema.simRounds.docId, did))
         .orderBy(asc(schema.simRounds.roundNo)),
-      db.select().from(schema.creditAccounts).where(eq(schema.creditAccounts.userId, userId)).limit(1),
+      db.select().from(schema.creditAccounts).where(eq(schema.creditAccounts.userId, uid)).limit(1),
       db
         .select()
         .from(schema.creditLedger)
-        .where(eq(schema.creditLedger.userId, userId))
+        .where(eq(schema.creditLedger.userId, uid))
         .orderBy(desc(schema.creditLedger.createdAt)),
-      db.select().from(schema.users).where(eq(schema.users.id, userId)).limit(1),
+      db.select().from(schema.users).where(eq(schema.users.id, uid)).limit(1),
     ]);
 
   // --- 承重决策卡 ---
@@ -259,9 +280,9 @@ export async function loadContext(
   });
 
   return {
-    userId,
-    docId,
-    userName: userRows[0]?.name || userId,
+    userId: uid,
+    docId: did,
+    userName: userRows[0]?.name || uid,
     studentNo: userRows[0]?.studentNo ?? null,
     decisions,
     decisionsFilled: decisions.length,

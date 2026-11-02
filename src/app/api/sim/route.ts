@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, asc } from "drizzle-orm";
-import { DEMO_USER_ID, DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 
 /** GET /api/sim — 跑机状态：假设卡 + 回合列表 + 事件详情 */
 export async function GET() {
+  const { userId, docId } = await getSessionIds();
   const assumptions = await db
     .select()
     .from(schema.simAssumptions)
-    .where(eq(schema.simAssumptions.docId, DEMO_DOC_ID))
+    .where(eq(schema.simAssumptions.docId, docId))
     .orderBy(asc(schema.simAssumptions.code));
 
   const rounds = await db
     .select()
     .from(schema.simRounds)
-    .where(eq(schema.simRounds.userId, DEMO_USER_ID))
+    .where(eq(schema.simRounds.userId, userId))
     .orderBy(asc(schema.simRounds.roundNo));
 
   // 补全事件详情

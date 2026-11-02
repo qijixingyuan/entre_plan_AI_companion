@@ -2,26 +2,27 @@ import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, and, desc } from "drizzle-orm";
 import {
-  DEMO_USER_ID,
+  getSessionIds,
   DEFAULT_MODULE_ID,
   getOrCreateCreditAccount,
 } from "@/lib/session";
 
 /** GET /api/coupons — 券定义 + 余额 + 已购历史 */
 export async function GET() {
+  const { userId } = await getSessionIds();
   const defs = await db
     .select()
     .from(schema.couponDefs)
     .where(eq(schema.couponDefs.active, 1));
 
-  const account = await getOrCreateCreditAccount();
+  const account = await getOrCreateCreditAccount(userId, DEFAULT_MODULE_ID);
 
   const purchases = await db
     .select()
     .from(schema.creditLedger)
     .where(
       and(
-        eq(schema.creditLedger.userId, DEMO_USER_ID),
+        eq(schema.creditLedger.userId, userId),
         eq(schema.creditLedger.moduleId, DEFAULT_MODULE_ID)
       )
     )

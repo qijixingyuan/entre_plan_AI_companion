@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq, and, desc } from "drizzle-orm";
-import { DEMO_USER_ID, DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 import { loadContext } from "@/lib/context";
 import { composeTransferPrompt, composeTranscript, buildSnapshot } from "@/lib/archive-compose";
 
@@ -9,6 +9,7 @@ import { composeTransferPrompt, composeTranscript, buildSnapshot } from "@/lib/a
  * GET /api/archives — 当前学生的存档版本列表（倒序，最新在前）
  */
 export async function GET() {
+  const { userId, docId } = await getSessionIds();
   const rows = await db
     .select({
       id: schema.chatArchives.id,
@@ -20,8 +21,8 @@ export async function GET() {
     .from(schema.chatArchives)
     .where(
       and(
-        eq(schema.chatArchives.userId, DEMO_USER_ID),
-        eq(schema.chatArchives.docId, DEMO_DOC_ID)
+        eq(schema.chatArchives.userId, userId),
+        eq(schema.chatArchives.docId, docId)
       )
     )
     .orderBy(desc(schema.chatArchives.version));
@@ -44,6 +45,7 @@ export async function GET() {
  * 每一次存档都是一份独立的快照，之后再产生的对话不影响已存版本。
  */
 export async function POST() {
+  const { userId, docId } = await getSessionIds();
   const ctx = await loadContext();
 
   if (ctx.aiMessages.filter((m) => m.role === "user").length === 0) {
@@ -58,8 +60,8 @@ export async function POST() {
     .from(schema.chatArchives)
     .where(
       and(
-        eq(schema.chatArchives.userId, DEMO_USER_ID),
-        eq(schema.chatArchives.docId, DEMO_DOC_ID)
+        eq(schema.chatArchives.userId, userId),
+        eq(schema.chatArchives.docId, docId)
       )
     )
     .orderBy(desc(schema.chatArchives.version))
@@ -81,8 +83,8 @@ export async function POST() {
   const id = `arch-${Date.now()}-${version}`;
   await db.insert(schema.chatArchives).values({
     id,
-    userId: DEMO_USER_ID,
-    docId: DEMO_DOC_ID,
+    userId: userId,
+    docId: docId,
     version,
     title,
     promptMd,

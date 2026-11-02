@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
-import { eq, desc, inArray } from "drizzle-orm";
-import { DEMO_USER_ID } from "@/lib/session";
+import { eq, desc, inArray, isNotNull } from "drizzle-orm";
 
 /**
  * GET /api/teacher/archives — 全体学生的存档总览（教师端）
  *
- * 当前版本仍是单用户演示身份（DEMO_USER_ID），但接口按 userId 分组返回，
- * 将来接上学号鉴权后无需改动查询逻辑。
+ * 2026-11-02（P0-3 学号鉴权落地）：接口本就按 userId 分组，接鉴权后无需改查询逻辑。
+ * 现在会列出**所有用学号登录过的学生**（含尚未产生存档的），
+ * 让教师看得到"谁进来了、谁还没开始"。
  *
  * 可选参数 ?userId=xxx 只看某个学生。
  */
@@ -42,6 +42,25 @@ export async function GET(req: NextRequest) {
     : [];
   const userMap = new Map(userRows.map((u) => [u.id, u]));
 
+  // 未指定学生时，补上全部用学号登录过的学生（即使还没有存档）
+  if (!filterUser) {
+    const allStudents = await db
+      .select({
+        id: schema.users.id,
+        name: schema.users.name,
+        studentNo: schema.users.studentNo,
+        classId: schema.users.classId,
+      })
+      .from(schema.users)
+      .where(isNotNull(schema.users.studentNo));
+    for (const s of allStudents) {
+      if (!userMap.has(s.id)) {
+        userMap.set(s.id, s);
+        userIds.push(s.id);
+      }
+    }
+  }
+
   // 按学生分组
   const grouped = userIds.map((uid) => {
     const u = userMap.get(uid);
@@ -68,8 +87,8 @@ export async function GET(req: NextRequest) {
       groups: grouped,
       totalArchives: rows.length,
       totalStudents: grouped.filter((g) => g.archives.length > 0).length,
-      /** 当前是单用户演示模式，标明一下，免得老师以为坏了 */
-      singleUserMode: rows.every((r) => r.userId === DEMO_USER_ID),
+      /** 登录学生总数（含尚未产生存档的），用于教师看「谁进来了」 */
+      loggedInStudents: grouped.length,
     },
   });
 }

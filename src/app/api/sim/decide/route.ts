@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
-import { DEMO_USER_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 import { CUSTOM_STRATEGY_BONUS } from "@/lib/guards";
 
 /** POST /api/sim/decide — 锁定跑机决策 */
 export async function POST(req: NextRequest) {
+  const { userId } = await getSessionIds();
   const body = await req.json();
   const { roundId, choice, customText, rationale, decidedWithinSec } = body;
 
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     // 超时不阻止，但记录告警
     await db.insert(schema.guardFlags).values({
       id: `gf-${Date.now()}`,
-      userId: DEMO_USER_ID,
+      userId: userId,
       gate: "oral_spotcheck",
       sourceTable: "sim_decisions",
       sourceId: roundId,

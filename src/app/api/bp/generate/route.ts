@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
-import { DEMO_DOC_ID } from "@/lib/session";
+import { getSessionIds } from "@/lib/session";
 import { loadContext } from "@/lib/context";
 import { composeFacts, composeBpMarkdown } from "@/lib/bp-compose";
 import { generateInvestorReview } from "@/lib/ai";
@@ -14,6 +14,7 @@ import { calcChangeRate } from "@/lib/guards";
  * 少一项都不给生成——这正是「跑机才有终点、留痕才有回报」的机制保证。
  */
 export async function POST() {
+  const { docId } = await getSessionIds();
   const ctx = await loadContext();
 
   if (!ctx.decisionsComplete) {
@@ -44,13 +45,13 @@ export async function POST() {
   const existing = await db
     .select()
     .from(schema.bpDocuments)
-    .where(eq(schema.bpDocuments.id, DEMO_DOC_ID))
+    .where(eq(schema.bpDocuments.id, docId))
     .limit(1);
   const oldContent = existing[0]?.contentMd || "";
 
   await db.insert(schema.bpRevisions).values({
     id: `rev-${Date.now()}`,
-    docId: DEMO_DOC_ID,
+    docId: docId,
     trigger: "sim_shock",
     beforeMd: oldContent.slice(0, 5000),
     afterMd: contentMd.slice(0, 5000),
@@ -67,10 +68,10 @@ export async function POST() {
         version: (existing[0].version ?? 1) + 1,
         updatedAt: new Date().toISOString(),
       })
-      .where(eq(schema.bpDocuments.id, DEMO_DOC_ID));
+      .where(eq(schema.bpDocuments.id, docId));
   } else {
     await db.insert(schema.bpDocuments).values({
-      id: DEMO_DOC_ID,
+      id: docId,
       userId: ctx.userId,
       moduleId: "mod-opportunity",
       version: 1,
