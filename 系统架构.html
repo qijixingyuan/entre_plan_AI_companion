@@ -149,7 +149,7 @@
       <span class="chip">Drizzle ORM 0.45 + better-sqlite3 13</span>
       <span class="chip">阿里百炼 DashScope · deepseek-v4-pro</span>
       <span class="chip">版本 v0.1.0</span>
-      <span class="chip">文档版本 2026-10-31 晚（教师端量规同源）</span>
+      <span class="chip">文档版本 2026-11-02（限流退避+每日备份）</span>
       <span class="chip">数据来源：源码实扫</span>
     </div>
   </div>
@@ -680,7 +680,9 @@
             <tr><td><code>list-models.mjs</code></td><td>列出百炼可用模型（选型用）</td></tr>
             <tr><td><code>test-prompt-portability.mjs</code></td><td>验证提示词可迁移到其他 AI 工具</td></tr>
             <tr><td><code>deploy.sh</code></td><td><code>deploy</code> / <code>rollback &lt;commit&gt;</code> / <code>status</code>，构建前自动备份 SQLite</td></tr>
+            <tr><td><code>backup-db.sh</code></td><td>数据库每日自动备份（<b>2026-11-02 新增</b>）：sqlite3 <code>.backup</code> 一致性快照 + 时间戳文件名不覆盖 + 保留 30 天 + <code>integrity_check</code> 校验；crontab <code>17 3 * * *</code></td></tr>
             <tr><td><code>check-contrast.mjs</code></td><td>Playwright + canvas 转 RGB，扫 WCAG 对比度，找深底深字</td></tr>
+            <tr><td><code>check-arch-html.mjs</code></td><td>架构图专用校验器：HTML DOM + SVG 文字 <code>fill</code> 对比度检测，退出码非 0 = 有致命配色缺陷</td></tr>
           </tbody>
         </table>
         <ul>
@@ -756,14 +758,15 @@
       <div class="fix"><b>修法：</b>与 P0-2 一并做：抽检标记 → 口试任务 → 教师录入口试结论 → 计入「过程留痕 30%」。</div>
     </div>
 
-    <div class="gap">
-      <h4>P1-6　AI 429 限流 + 数据库无自动备份<span class="meta">🟡 P1</span></h4>
-      <p>全班同时上课时 API 短时连续调用会 429，<code>callLLM()</code> 无退避重试；同时 <code>deploy.sh</code> 只在部署时手动备份，无 crontab 定时任务。</p>
-      <div class="fix"><b>修法：</b>加指数退避重试 + 每日 DB 备份 crontab（保命项，建议与 P0-3 同期做）。</div>
+    <div class="gap" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
+      <h4 style="color:var(--ok)">P1-6　AI 429 限流 + 数据库无自动备份<span class="meta" style="color:var(--ok)">✅ 已修复 2026-11-02</span></h4>
+      <p><b>原症状：</b>全班同时上课时 API 短时连续调用会 429，<code>callLLM()</code> 无退避重试，撞到限流直接返回一句「服务暂时不可用」；同时 <code>deploy.sh</code> 只在部署时手动备份，<code>data/harness.db</code> 平时完全裸奔。</p>
+      <div class="fix"><b>修法（已落地）：</b>① <code>src/lib/ai.ts</code> 的 <code>request()</code> 改为<b>双层退避重试</b>——对 429/5xx 指数退避（1s→2s→4s + 抖动）+ 多把 key 轮换（<code>DASHSCOPE_API_KEY_BACKUP</code> 逗号分隔）；重试耗尽时区分「限流」与「真故障」给出可执行提示，不再让全班看到同一句无信息量报错。② 新增 <code>scripts/backup-db.sh</code>：用 sqlite3 <code>.backup</code> 做<b>一致性快照</b>（不是 cp —— WAL 模式下 cp 可能拷到损坏快照）+ 文件名带时间戳不覆盖 + 保留 30 天自动清理 + 每次 <code>integrity_check</code> 校验，损坏即报警；服务器 crontab <code>17 3 * * *</code> 每日 03:17 自动执行。</div>
     </div>
 
     <div class="callout">
-      <b>建议推进顺序：</b>P0-3 鉴权 + P1-6 备份（保命与开门）→ P0-2 教师端接线（含 P1-5 口试）→ P1-4 AI 写 BP → P0-1 券产出。
+      <b>推进顺序与进度：</b>P0-3 鉴权 + P1-6 备份（保命与开门）→ P0-2 教师端接线（含 P1-5 口试）→ P1-4 AI 写 BP → P0-1 券产出。
+      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ⏳ P0-3 鉴权进行中。
     </div>
   </section>
 

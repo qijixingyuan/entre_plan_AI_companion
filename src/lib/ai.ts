@@ -119,48 +119,102 @@ export function parseAITag(raw: string): { body: string; tag: AITag | null } {
   };
 }
 
+/**
+ * 重试策略：针对 429（限流）与 5xx（服务端临时故障）做指数退避重试。
+ *
+ * 背景（2026-11-02 落地，架构文档 §6 P1-6）：
+ * 全班 40 人同时上课时，每人一轮对话要调 AI 2-3 次，一节课 100+ 次调用，
+ * 同一把 DASHSCOPE_API_KEY 必然大面积 429。原实现撞到 429 直接返回一句
+ * "服务暂时不可用"，学生看到的是失败，教师看到的是"全班崩了"。
+ * 现在改为：可重试错误自动退避重试，扛过短时限流窗口；
+ * 真的扛不住时，给出"这是限流不是你的错，等 X 秒再试"的可执行提示。
+ */
+const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 1000;
+/** 备用密钥轮换：多把 key 轮着用，分散单 key 配额（DEV-GUIDE §9 未完成项 3） */
+function getApiKeys(): string[] {
+  const primary = process.env.DASHSCOPE_API_KEY;
+  const extra = (process.env.DASHSCOPE_API_KEY_BACKUP || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return [primary, ...extra].filter((k): k is string => Boolean(k));
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function request(
   systemPrompt: string,
   messages: ChatMessage[],
   maxTokens = 900
 ): Promise<string> {
-  const apiKey = process.env.DASHSCOPE_API_KEY;
+  const keys = getApiKeys();
   const baseUrl =
     process.env.DASHSCOPE_BASE_URL ||
     "https://dashscope.aliyuncs.com/compatible-mode/v1";
   const model = process.env.DASHSCOPE_MODEL || "deepseek-chat";
 
-  if (!apiKey) {
+  if (keys.length === 0) {
     return "⚠️ AI 服务未配置（缺少 DASHSCOPE_API_KEY），请联系教师。";
   }
 
-  try {
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "system", content: systemPrompt }, ...messages.slice(-20)],
-        temperature: 0.7,
-        max_tokens: maxTokens,
-      }),
-    });
+  let lastStatus = 0;
+  let lastError = "";
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error("LLM API error:", res.status, err);
-      return `⚠️ AI 服务暂时不可用（${res.status}），请稍后重试。`;
+  // 轮换 key × 退避重试，双层循环
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const apiKey = keys[attempt % keys.length];
+    try {
+      const res = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "system", content: systemPrompt }, ...messages.slice(-20)],
+          temperature: 0.7,
+          max_tokens: maxTokens,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || "（AI 返回为空，请重试）";
+      }
+
+      lastStatus = res.status;
+      lastError = await res.text();
+
+      if (!RETRYABLE_STATUS.has(res.status) || attempt === MAX_RETRIES) {
+        console.error("LLM API error:", res.status, lastError);
+        break;
+      }
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
+      console.error("LLM call failed:", e);
+      if (attempt === MAX_RETRIES) break;
     }
 
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || "（AI 返回为空，请重试）";
-  } catch (e) {
-    console.error("LLM call failed:", e);
-    return "⚠️ AI 服务连接失败，请检查网络后重试。";
+    // 指数退避 + 抖动，避免全班同时重试再次打爆
+    const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.floor(Math.random() * 500);
+    console.warn(`LLM retry ${attempt + 1}/${MAX_RETRIES} after ${delay}ms (status=${lastStatus})`);
+    await sleep(delay);
   }
+
+  // 重试耗尽：区分「限流」与「真故障」，给出可执行提示
+  if (lastStatus === 429) {
+    return `⚠️ AI 服务当前被限流（全班同时用同一把密钥会触发），已自动重试 ${MAX_RETRIES} 次仍未成功。\n这不是你的操作问题——等 30 秒后再发一次即可。若持续出现，请告知教师需要加备用密钥。`;
+  }
+  if (lastStatus >= 500) {
+    return `⚠️ AI 服务暂时异常（${lastStatus}），已自动重试 ${MAX_RETRIES} 次仍未成功。请稍后再试，若持续出现请告知教师。`;
+  }
+  if (lastStatus) {
+    return `⚠️ AI 服务返回异常（${lastStatus}），请稍后重试。`;
+  }
+  return "⚠️ AI 服务连接失败，请检查网络后重试。";
 }
 
 /** AI 学伴的守门人对话 —— 注入「当前节点」的判据（更准、更省 token） */

@@ -76,7 +76,7 @@
   <div>
     <span class="tag">面向任课教师与同行</span>
     <span class="tag">无需编程基础</span>
-    <span class="tag">文档版本 2026-10-31</span>
+    <span class="tag">文档版本 2026-11-02（限流退避+每日备份）</span>
   </div>
 </header>
 
@@ -167,7 +167,7 @@
         <text x="680" y="478" text-anchor="middle" font-size="11" fill="#c7d2fe">不是“交一份稿子就完事”</text>
         <text x="680" y="500" text-anchor="middle" font-size="11" fill="#c7d2fe">学生改十次，教师能看到</text>
         <text x="680" y="522" text-anchor="middle" font-size="11" fill="#c7d2fe">每一次的来龙去脉</text>
-        <text x="680" y="556" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fecaca">⚠ P1-6 数据库无自动备份</text>
+        <text x="680" y="556" text-anchor="middle" font-size="10.5" font-weight="700" fill="#86efac">✓ 每日自动备份（2026-11-02）</text>
       </g>
 
       <!-- 数据中枢 → 教师 箭头 -->
@@ -202,11 +202,11 @@
       <g>
         <rect x="40" y="620" width="1280" height="70" rx="12" fill="#fef3c7" stroke="#fcd34d"/>
         <text x="60" y="650" font-size="15" font-weight="700" fill="#92400e">AI 模型服务（阿里百炼）</text>
-        <text x="60" y="674" font-size="12.5" fill="#78350f">仅「第 1 站 AI 学伴」调用，不存储任何学生数据 · 当前同一密钥短时高频会触发限流（见第六章 P1-6）</text>
+        <text x="60" y="674" font-size="12.5" fill="#78350f">仅「第 1 站 AI 学伴」调用，不存储任何学生数据 · 撞到限流会自动退避重试、多把密钥轮换（2026-11-02 已修，见第六章）</text>
       </g>
 
       <!-- 底部断点条 -->
-      <text x="40" y="724" font-size="13" font-weight="700" fill="#b91c1c">当前已知断点（按“能不能上课用”排序，详见第六章）</text>
+      <text x="40" y="724" font-size="13" font-weight="700" fill="#b91c1c">当前已知断点（按“能不能上课用”排序，详见第六章）　<span font-size="11" font-weight="400" fill="#065f46">· 绿色为已解决</span></text>
       <g>
         <rect x="40" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
         <text x="52" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P0-3 无学号鉴权</text>
@@ -223,10 +223,10 @@
         <text x="488" y="776" font-size="11" fill="#7f1d1d">买完什么都没生成</text>
         <text x="488" y="790" font-size="11" fill="#7f1d1d">激励失效</text>
 
-        <rect x="694" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
-        <text x="706" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P1-6 限流+无备份</text>
-        <text x="706" y="776" font-size="11" fill="#7f1d1d">全班上课必崩</text>
-        <text x="706" y="790" font-size="11" fill="#7f1d1d">数据全丢</text>
+        <rect x="694" y="734" width="206" height="64" rx="9" fill="#ecfdf5" stroke="#6ee7b7"/>
+        <text x="706" y="756" font-size="12.5" font-weight="700" fill="#065f46">✓ P1-6 已解决</text>
+        <text x="706" y="776" font-size="11" fill="#047857">限流自动重试</text>
+        <text x="706" y="790" font-size="11" fill="#047857">每日自动备份</text>
 
         <rect x="912" y="734" width="206" height="64" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
         <text x="924" y="756" font-size="12.5" font-weight="700" fill="#b91c1c">P1-4 无写BP闭环</text>
@@ -375,17 +375,17 @@
     </div>
   </div>
 
-  <div class="risk">
-    <div class="rank">4</div>
+  <div class="risk" style="border-left-color:#065f46;background:#ecfdf5;border-color:#6ee7b7">
+    <div class="rank" style="background:#065f46;color:#ffffff">✓</div>
     <div class="body">
-      <h4>【全班上课必崩 + 数据全丢】AI 限流 + 数据库无自动备份</h4>
-      <div class="why">为什么影响教学：全班同时上课时，每人一轮对话要调 AI 2–3 次，40 人一节课 100+ 次调用，必然大面积失败；数据库无定时备份，库一挂这学期过程分全没，没有第二次机会。</div>
-      <div class="do">要做什么：备用密钥轮换 + 请求队列与退避重试；数据库每日定时备份到带时间戳目录、保留 30 天。</div>
+      <h4 style="color:#065f46">【已解除】AI 限流 + 数据库无自动备份　<span style="font-size:11px;font-weight:400;color:#047857">2026-11-02 修复</span></h4>
+      <div class="why"><b>原来为什么影响教学：</b>全班同时上课时，每人一轮对话要调 AI 2–3 次，40 人一节课 100+ 次调用，必然大面积失败；数据库无定时备份，库一挂这学期过程分全没，没有第二次机会。</div>
+      <div class="do"><b>现在怎么解决的：</b>① AI 调用遇到限流会自动<b>退避重试</b>（最多 3 次，逐步等待），还支持多把密钥轮换；实在扛不住时给学生的提示是「这不是你的问题，等 30 秒再发」，而不是一句看不懂的报错。② 数据库<b>每天凌晨 3:17 自动备份</b>，用不会拷坏的一致性快照方式，文件名带时间戳、保留 30 天，每次备份后自动校验是否损坏。</div>
     </div>
   </div>
 
   <div class="risk">
-    <div class="rank">5</div>
+    <div class="rank">4</div>
     <div class="body">
       <h4>【体验断点】AI 学伴无“写入 BP”闭环</h4>
       <div class="why">为什么影响教学：AI 在对话里给出可用段落，学生只能手动复制粘贴到计划书编辑器。手工复制会打断心流，学生多半懒得搬——于是 AI 产出进不了计划书，正是系统要对抗的病。</div>
@@ -394,7 +394,7 @@
   </div>
 
   <div class="risk">
-    <div class="rank">6</div>
+    <div class="rank">5</div>
     <div class="body">
       <h4>【防作弊缺口】口试模块建了未接线</h4>
       <div class="why">为什么影响教学：口试是“过程留痕 30%”的兜底——书面留痕能被伪造，口试不能。设计里口试是闸门之一，但功能不存在。</div>
@@ -442,7 +442,7 @@
 </section>
 
 <footer>
-  bp-harness 教师版架构说明 · 文档版本 2026-10-31 晚（方法论母本已接入 · 教师端量规同源）· 与开发者版同步维护<br/>
+  bp-harness 教师版架构说明 · 文档版本 2026-11-02（限流退避+每日备份）· 与开发者版同步维护<br/>
   本文件仅供教学研讨使用，所涉未完成项以线上实际版本为准。
 </footer>
 
