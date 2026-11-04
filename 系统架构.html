@@ -149,7 +149,7 @@
       <span class="chip">Drizzle ORM 0.45 + better-sqlite3 13</span>
       <span class="chip">阿里百炼 DashScope · deepseek-v4-pro</span>
       <span class="chip">版本 v0.1.0</span>
-      <span class="chip">文档版本 2026-11-04（用户故事+交互设计）</span>
+      <span class="chip">文档版本 2026-11-04（取证清单+任务去重）</span>
       <span class="chip">数据来源：源码实扫</span>
     </div>
   </div>
@@ -159,7 +159,7 @@
 
   <div class="kpis">
     <div class="kpi"><div class="n">14</div><div class="l">前端页面 page.tsx</div><div class="s">学生 7 · 教师 5 · 入口 1 · 登录 1</div></div>
-    <div class="kpi"><div class="n">21</div><div class="l">API 路由 route.ts</div><div class="s">学生 14 · 教师 5 · 鉴权 2</div></div>
+    <div class="kpi"><div class="n">22</div><div class="l">API 路由 route.ts</div><div class="s">学生 15 · 教师 5 · 鉴权 2</div></div>
     <div class="kpi"><div class="n">20</div><div class="l">数据表 sqliteTable</div><div class="s">6 个业务域</div></div>
     <div class="kpi"><div class="n">6</div><div class="l">领域模块 src/lib</div><div class="s">1672 行核心逻辑</div></div>
     <div class="kpi"><div class="n">5 + 4</div><div class="l">承重节点 + 跑机回合</div><div class="s">双门禁后方可生成 BP</div></div>
@@ -179,7 +179,7 @@
     </div>
 
     <div class="figure">
-    <svg viewBox="0 0 1360 930" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">
+    <svg viewBox="0 0 1360 1020" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">
       <defs>
         <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
@@ -250,17 +250,18 @@
       <text x="56" y="198" font-size="13" font-weight="700" fill="#312e81">L2 应用层</text>
       <text x="56" y="216" font-size="11" fill="#475569">Route</text>
       <text x="56" y="232" font-size="11" fill="#475569">Handler</text>
-      <text x="56" y="248" font-size="11" fill="#475569">21 个</text>
+      <text x="56" y="248" font-size="11" fill="#475569">22 个</text>
 
       <!-- C1 -->
       <rect x="110" y="190" width="390" height="76" rx="9" fill="#ffffff" stroke="#a5b4fc"/>
-      <text x="122" y="207" font-size="11.5" font-weight="700" fill="#3730a3">AI 对话与决策 · 3 路由</text>
+      <text x="122" y="207" font-size="11.5" font-weight="700" fill="#3730a3">AI 对话与决策 · 4 路由</text>
       <g font-size="10.5" fill="#334155">
         <text x="124" y="226" font-family="ui-monospace,Menlo,monospace">GET</text><text x="166" y="226">/api/chat</text><text x="290" y="226" font-size="9.5" fill="#64748b">取历史</text>
         <text x="124" y="243" font-family="ui-monospace,Menlo,monospace">POST</text><text x="166" y="243">/api/chat</text><text x="290" y="243" font-size="9.5" fill="#64748b">放行节点</text>
         <text x="124" y="260" font-family="ui-monospace,Menlo,monospace">DEL</text><text x="166" y="260">/api/chat</text><text x="290" y="260" font-size="9.5" fill="#64748b">清空</text>
         <text x="352" y="226" font-family="ui-monospace,Menlo,monospace" font-size="10">GET</text><text x="386" y="226">/nodes</text>
         <text x="352" y="243" font-family="ui-monospace,Menlo,monospace" font-size="10">GET/POST</text><text x="404" y="243">/decisions</text>
+        <text x="352" y="260" font-family="ui-monospace,Menlo,monospace" font-size="10">GET</text><text x="386" y="260">/evidence-checklist</text>
       </g>
 
       <!-- C2 -->
@@ -320,11 +321,11 @@
       <line x1="1115" y1="352" x2="1115" y2="386" stroke="#64748b" stroke-width="1.4" marker-end="url(#ar)"/>
 
       <!-- ===== L3 领域层 ===== -->
-      <rect x="40" y="386" width="1280" height="112" rx="12" fill="#f5f3ff" stroke="#ddd6fe"/>
+      <rect x="40" y="386" width="1280" height="200" rx="12" fill="#f5f3ff" stroke="#ddd6fe"/>
       <text x="56" y="408" font-size="13" font-weight="700" fill="#4c1d95">L3 领域层</text>
       <text x="56" y="426" font-size="11" fill="#475569">src/lib</text>
-      <text x="56" y="442" font-size="11" fill="#475569">6 个模块</text>
-      <text x="56" y="458" font-size="11" fill="#475569">1672 行</text>
+      <text x="56" y="442" font-size="11" fill="#475569">7 个模块</text>
+      <text x="56" y="458" font-size="11" fill="#475569">2050 行</text>
 
       <g>
         <rect x="110" y="400" width="196" height="84" rx="9" fill="#ffffff" stroke="#c4b5fd"/>
@@ -340,7 +341,7 @@
         <text x="328" y="433" font-size="10" fill="#475569">守门人 system prompt</text>
         <text x="328" y="447" font-size="10" fill="#475569">parseAITag() 协议解析</text>
         <text x="328" y="461" font-size="10" fill="#475569">generateInvestorReview()</text>
-        <text x="328" y="477" font-size="9" font-weight="700" fill="#b45309">P1-6 429 限流 · 无重试</text>
+        <text x="328" y="477" font-size="9" font-weight="700" fill="#047857">429 退避已修 · 任务不重复</text>
       </g>
       <g>
         <rect x="522" y="400" width="196" height="84" rx="9" fill="#ffffff" stroke="#c4b5fd"/>
@@ -364,7 +365,7 @@
         <text x="946" y="433" font-size="10" fill="#475569">低分必附证据</text>
         <text x="946" y="447" font-size="10" fill="#475569">教师 20% 覆核 · 退让上限 2</text>
         <text x="946" y="461" font-size="10" fill="#475569">改写率 &lt;30% · 口试抽查</text>
-        <text x="946" y="477" font-size="9" fill="#5b21b6">83 行 · 应用层强制</text>
+        <text x="946" y="477" font-size="9" fill="#5b21b6">引号闸门已停用 · 质量交 AI</text>
       </g>
       <g>
         <rect x="1124" y="400" width="184" height="84" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
@@ -374,115 +375,132 @@
         <text x="1136" y="461" font-size="10" fill="#475569">积分账户（初始 5 券）</text>
         <text x="1136" y="477" font-size="9" font-weight="700" fill="#047857">P0-3 已修 · 2026-11-02</text>
       </g>
+      <g>
+        <rect x="110" y="494" width="380" height="80" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+        <text x="122" y="511" font-size="11.5" font-weight="700" fill="#065f46">task-fingerprint.ts · 任务指纹去重</text>
+        <text x="122" y="527" font-size="10" fill="#475569">把 AI 派的取证任务拆成 人数/人群/地点/问题/交付物 五要素</text>
+        <text x="122" y="541" font-size="10" fill="#475569">加权比对相似度 → 识别"又派了同一个任务"</text>
+        <text x="122" y="558" font-size="10" fill="#475569">命中即带强制换任务指令重跑，AI 必须换地点/人群/问法/交付物</text>
+        <text x="122" y="571" font-size="9" font-weight="700" fill="#047857">2026-11-04 新增 · 阈值 0.68（线上实测：真重复 71-77% 命中）</text>
+      </g>
+      <g>
+        <rect x="500" y="494" width="380" height="80" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+        <text x="512" y="511" font-size="11.5" font-weight="700" fill="#065f46">methodology/ · 方法论母本</text>
+        <text x="512" y="527" font-size="10" fill="#475569">判据表.md · 单位经济模型.md · README.md</text>
+        <text x="512" y="541" font-size="10" fill="#475569">运行时读取注入 AI prompt，改 md 即生效</text>
+        <text x="512" y="558" font-size="10" fill="#475569">5 节点各附「取证清单」= 学生填空格式 + AI 验收标准</text>
+        <text x="512" y="571" font-size="9" font-weight="700" fill="#047857">同源：AI 拦的 = 老师教的 = 学生看的</text>
+      </g>
+      </g>
 
       <!-- L3→L4 -->
-      <path d="M 208 484 L 208 520" stroke="#1d4ed8" stroke-width="2" marker-end="url(#ar2)"/>
-      <path d="M 700 484 L 700 520" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
-      <path d="M 1216 484 L 1216 520" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
-      <text x="216" y="506" font-size="10" font-weight="700" fill="#1d4ed8">读（唯一入口）</text>
-      <text x="708" y="506" font-size="10" fill="#64748b">写</text>
+      <path d="M 208 586 L 208 608" stroke="#1d4ed8" stroke-width="2" marker-end="url(#ar2)"/>
+      <path d="M 700 586 L 700 608" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+      <path d="M 1216 586 L 1216 608" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+      <text x="216" y="602" font-size="10" font-weight="700" fill="#1d4ed8">读（唯一入口）</text>
+      <text x="708" y="602" font-size="10" fill="#64748b">写</text>
 
       <!-- ===== L4 数据层 ===== -->
-      <rect x="40" y="520" width="1280" height="238" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/>
-      <text x="56" y="542" font-size="13" font-weight="700" fill="#065f46">L4 数据层</text>
-      <text x="56" y="560" font-size="11" fill="#475569">SQLite</text>
-      <text x="56" y="576" font-size="11" fill="#475569">20 张表</text>
-      <text x="56" y="592" font-size="11" fill="#475569">Drizzle ORM</text>
-      <text x="56" y="608" font-size="11" fill="#475569">data/*.db</text>
+      <rect x="40" y="608" width="1280" height="238" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/>
+      <text x="56" y="630" font-size="13" font-weight="700" fill="#065f46">L4 数据层</text>
+      <text x="56" y="648" font-size="11" fill="#475569">SQLite</text>
+      <text x="56" y="664" font-size="11" fill="#475569">20 张表</text>
+      <text x="56" y="680" font-size="11" fill="#475569">Drizzle ORM</text>
+      <text x="56" y="696" font-size="11" fill="#475569">data/*.db</text>
 
       <!-- 域1 -->
-      <rect x="110" y="534" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
-      <text x="122" y="551" font-size="11.5" font-weight="700" fill="#047857">用户与文档 · 5</text>
+      <rect x="110" y="622" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+      <text x="122" y="639" font-size="11.5" font-weight="700" fill="#047857">用户与文档 · 5</text>
       <g font-size="10" fill="#334155" font-family="ui-monospace,Menlo,monospace">
-        <text x="124" y="570">users</text><text x="124" y="586">classes</text><text x="124" y="602">bp_modules</text>
-        <text x="220" y="570">bp_documents</text><text x="220" y="586">bp_revisions</text>
-        <text x="340" y="570" font-size="9.5" fill="#64748b">版本快照</text>
-        <text x="340" y="586" font-size="9.5" fill="#64748b">触发=sim_shock</text>
+        <text x="124" y="658">users</text><text x="124" y="674">classes</text><text x="124" y="690">bp_modules</text>
+        <text x="220" y="658">bp_documents</text><text x="220" y="674">bp_revisions</text>
+        <text x="340" y="658" font-size="9.5" fill="#64748b">版本快照</text>
+        <text x="340" y="674" font-size="9.5" fill="#64748b">触发=sim_shock</text>
       </g>
       <!-- 域2 -->
-      <rect x="516" y="534" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
-      <text x="528" y="551" font-size="11.5" font-weight="700" fill="#047857">决策与 AI 对话 · 3</text>
+      <rect x="516" y="622" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+      <text x="528" y="639" font-size="11.5" font-weight="700" fill="#047857">决策与 AI 对话 · 3</text>
       <g font-size="10" fill="#334155" font-family="ui-monospace,Menlo,monospace">
-        <text x="530" y="570">load_bearing_decisions</text>
-        <text x="530" y="586">ai_messages</text>
-        <text x="530" y="602">ai_proposals</text>
-        <text x="740" y="570" font-size="9.5" fill="#64748b">5 节点 · 承重决策</text>
-        <text x="740" y="586" font-size="9.5" fill="#64748b">turnId 轮次标记</text>
-        <text x="740" y="602" font-size="9.5" fill="#64748b">AI 提案留痕</text>
+        <text x="530" y="658">load_bearing_decisions</text>
+        <text x="530" y="674">ai_messages</text>
+        <text x="530" y="690">ai_proposals</text>
+        <text x="740" y="658" font-size="9.5" fill="#64748b">5 节点 · 承重决策</text>
+        <text x="740" y="674" font-size="9.5" fill="#64748b">turnId 轮次标记</text>
+        <text x="740" y="690" font-size="9.5" fill="#64748b">AI 提案留痕</text>
       </g>
       <!-- 域3 -->
-      <rect x="922" y="534" width="386" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
-      <text x="934" y="551" font-size="11.5" font-weight="700" fill="#047857">学习留痕 · 3</text>
+      <rect x="922" y="622" width="386" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+      <text x="934" y="639" font-size="11.5" font-weight="700" fill="#047857">学习留痕 · 3</text>
       <g font-size="10" fill="#334155" font-family="ui-monospace,Menlo,monospace">
-        <text x="936" y="570">record_cards</text><text x="936" y="586">guard_flags</text>
-        <text x="936" y="602">oral_defenses</text>
-        <text x="1090" y="570" font-size="9.5" fill="#64748b">完成度检查台</text>
-        <text x="1090" y="586" font-size="9.5" fill="#64748b">闸门告警</text>
-        <text x="1090" y="602" font-size="9.5" font-weight="700" fill="#b91c1c">P1-5 建表无代码</text>
+        <text x="936" y="658">record_cards</text><text x="936" y="674">guard_flags</text>
+        <text x="936" y="690">oral_defenses</text>
+        <text x="1090" y="658" font-size="9.5" fill="#64748b">完成度检查台</text>
+        <text x="1090" y="674" font-size="9.5" fill="#64748b">闸门告警</text>
+        <text x="1090" y="690" font-size="9.5" font-weight="700" fill="#b91c1c">P1-5 建表无代码</text>
       </g>
       <!-- 域4 -->
-      <rect x="110" y="644" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
-      <text x="122" y="661" font-size="11.5" font-weight="700" fill="#047857">积分券 · 3</text>
+      <rect x="110" y="732" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+      <text x="122" y="749" font-size="11.5" font-weight="700" fill="#047857">积分券 · 3</text>
       <g font-size="10" fill="#334155" font-family="ui-monospace,Menlo,monospace">
-        <text x="124" y="680">coupon_defs</text><text x="124" y="696">credit_accounts</text><text x="124" y="712">credit_ledger</text>
-        <text x="250" y="680" font-size="9.5" fill="#64748b">券定义</text>
-        <text x="250" y="696" font-size="9.5" fill="#64748b">余额 + 规则 JSON</text>
-        <text x="250" y="712" font-size="9.5" fill="#64748b">流水</text>
-        <text x="330" y="696" font-size="9.5" font-weight="700" fill="#b91c1c">P0-1 只有流水无产出</text>
+        <text x="124" y="768">coupon_defs</text><text x="124" y="784">credit_accounts</text><text x="124" y="800">credit_ledger</text>
+        <text x="250" y="768" font-size="9.5" fill="#64748b">券定义</text>
+        <text x="250" y="784" font-size="9.5" fill="#64748b">余额 + 规则 JSON</text>
+        <text x="250" y="800" font-size="9.5" fill="#64748b">流水</text>
+        <text x="330" y="784" font-size="9.5" font-weight="700" fill="#b91c1c">P0-1 只有流水无产出</text>
       </g>
       <!-- 域5 -->
-      <rect x="516" y="644" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
-      <text x="528" y="661" font-size="11.5" font-weight="700" fill="#047857">跑机模拟 · 5</text>
+      <rect x="516" y="732" width="390" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+      <text x="528" y="749" font-size="11.5" font-weight="700" fill="#047857">跑机模拟 · 5</text>
       <g font-size="10" fill="#334155" font-family="ui-monospace,Menlo,monospace">
-        <text x="530" y="680">sim_assumptions</text><text x="530" y="696">sim_events</text>
-        <text x="530" y="712">sim_rounds</text><text x="530" y="728">sim_decisions</text>
-        <text x="700" y="712">sim_outcomes</text>
-        <text x="700" y="680" font-size="9.5" fill="#64748b">初始假设</text>
-        <text x="700" y="696" font-size="9.5" fill="#64748b">60 条事件</text>
-        <text x="700" y="712" font-size="9.5" fill="#64748b">4 回合</text>
-        <text x="700" y="728" font-size="9.5" fill="#64748b">决策留痕</text>
+        <text x="530" y="768">sim_assumptions</text><text x="530" y="784">sim_events</text>
+        <text x="530" y="800">sim_rounds</text><text x="530" y="816">sim_decisions</text>
+        <text x="700" y="800">sim_outcomes</text>
+        <text x="700" y="768" font-size="9.5" fill="#64748b">初始假设</text>
+        <text x="700" y="784" font-size="9.5" fill="#64748b">60 条事件</text>
+        <text x="700" y="800" font-size="9.5" fill="#64748b">4 回合</text>
+        <text x="700" y="816" font-size="9.5" fill="#64748b">决策留痕</text>
       </g>
       <!-- 域6 -->
-      <rect x="922" y="644" width="386" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
-      <text x="934" y="661" font-size="11.5" font-weight="700" fill="#047857">提示词与交互存档 · 1</text>
+      <rect x="922" y="732" width="386" height="100" rx="9" fill="#ffffff" stroke="#6ee7b7"/>
+      <text x="934" y="749" font-size="11.5" font-weight="700" fill="#047857">提示词与交互存档 · 1</text>
       <g font-size="10" fill="#334155" font-family="ui-monospace,Menlo,monospace">
-        <text x="936" y="680">chat_archives</text>
-        <text x="936" y="696" font-size="9.5" fill="#64748b">version · promptMd · transcriptMd · snapshotJson</text>
-        <text x="936" y="712" font-size="9.5" fill="#64748b">唯一约束 (userId, docId, version) → 旧版不覆盖</text>
-        <text x="936" y="728" font-size="9.5" fill="#64748b">教师端可列全部学生存档并下载</text>
+        <text x="936" y="768">chat_archives</text>
+        <text x="936" y="784" font-size="9.5" fill="#64748b">version · promptMd · transcriptMd · snapshotJson</text>
+        <text x="936" y="800" font-size="9.5" fill="#64748b">唯一约束 (userId, docId, version) → 旧版不覆盖</text>
+        <text x="936" y="816" font-size="9.5" fill="#64748b">教师端可列全部学生存档并下载</text>
       </g>
 
       <!-- ===== L5 外部与运维 ===== -->
-      <rect x="40" y="778" width="1280" height="128" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-      <text x="56" y="800" font-size="13" font-weight="700" fill="#334155">L5 外部服务与运维</text>
+      <rect x="40" y="866" width="1280" height="128" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="56" y="888" font-size="13" font-weight="700" fill="#334155">L5 外部服务与运维</text>
 
       <!-- LLM -->
-      <rect x="110" y="810" width="390" height="84" rx="9" fill="#fff7ed" stroke="#fdba74"/>
+      <rect x="110" y="898" width="390" height="84" rx="9" fill="#fff7ed" stroke="#fdba74"/>
       <g>
         <rect x="121.5" y="813.5" width="17" height="17" rx="8.5" fill="#b45309"/>
         <text x="130" y="825.5" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">1</text>
       </g>
-      <text x="146" y="828" font-size="11.5" font-weight="700" fill="#b45309">阿里百炼 DashScope</text>
-      <text x="122" y="845" font-size="10" fill="#475569">模型 deepseek-v4-pro（百炼专属端点）</text>
-      <text x="122" y="860" font-size="10" fill="#475569">仅 ai.ts 调用 · 环境变量注入，不落库</text>
-      <text x="122" y="877" font-size="9.5" font-weight="700" fill="#047857">P1-6 已修：429 指数退避重试 + 多密钥轮换</text>
+      <text x="146" y="916" font-size="11.5" font-weight="700" fill="#b45309">阿里百炼 DashScope</text>
+      <text x="122" y="933" font-size="10" fill="#475569">模型 deepseek-v4-pro（百炼专属端点）</text>
+      <text x="122" y="948" font-size="10" fill="#475569">仅 ai.ts 调用 · 环境变量注入，不落库</text>
+      <text x="122" y="965" font-size="9.5" font-weight="700" fill="#047857">P1-6 已修：429 指数退避重试 + 多密钥轮换</text>
 
       <!-- 脚本 -->
-      <rect x="516" y="810" width="390" height="84" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
-      <text x="528" y="828" font-size="11.5" font-weight="700" fill="#334155">脚本层 scripts/ · 10</text>
+      <rect x="516" y="898" width="390" height="84" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="528" y="916" font-size="11.5" font-weight="700" fill="#334155">脚本层 scripts/ · 10</text>
       <g font-size="9.5" fill="#475569" font-family="ui-monospace,Menlo,monospace">
-        <text x="530" y="845">init-db · bootstrap-demo · seed-events-changsha</text>
-        <text x="530" y="860">manual-to-html · list-models · test-prompt-portability</text>
-        <text x="530" y="875" font-weight="700" fill="#b45309">deploy.sh · backup-db.sh（每日备份）· check-contrast.mjs</text>
+        <text x="530" y="933">init-db · bootstrap-demo · seed-events-changsha</text>
+        <text x="530" y="948">manual-to-html · list-models · test-prompt-portability</text>
+        <text x="530" y="963" font-weight="700" fill="#b45309">deploy.sh · backup-db.sh（每日备份）· check-contrast.mjs</text>
       </g>
 
       <!-- 部署 -->
-      <rect x="922" y="810" width="386" height="84" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
-      <text x="934" y="828" font-size="11.5" font-weight="700" fill="#334155">部署与版本管理</text>
+      <rect x="922" y="898" width="386" height="84" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="934" y="916" font-size="11.5" font-weight="700" fill="#334155">部署与版本管理</text>
       <g font-size="10" fill="#475569">
-        <text x="936" y="845">阿里云 ECS · pm2 bp-harness · nginx 反代 :3005</text>
-        <text x="936" y="860">构建只在服务器做（本地禁 npm run build）</text>
-        <text x="936" y="875">本地 Git + 服务器 Git 双仓，自动备份 SQLite</text>
+        <text x="936" y="933">阿里云 ECS · pm2 bp-harness · nginx 反代 :3005</text>
+        <text x="936" y="948">构建只在服务器做（本地禁 npm run build）</text>
+        <text x="936" y="963">本地 Git + 服务器 Git 双仓，自动备份 SQLite</text>
       </g>
 
       <!-- ai.ts → LLM：用①编号关联，避免连线穿模（曾水平穿 context.ts、竖穿 L4 表卡片） -->
@@ -491,7 +509,7 @@
         <rect x="461.5" y="403.5" width="17" height="17" rx="8.5" fill="#b45309"/>
         <text x="470" y="415.5" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">1</text>
       </g>
-      <text x="446" y="497" font-size="9.5" font-weight="700" fill="#b45309">↓ 外部服务见 L5</text>
+      <text x="446" y="585" font-size="9.5" font-weight="700" fill="#b45309">↓ 外部服务见 L5</text>
     </svg>
     </div>
   </section>
@@ -598,14 +616,15 @@
     </details>
 
     <details>
-      <summary>L2 应用层 · 21 个路由清单</summary>
+      <summary>L2 应用层 · 22 个路由清单</summary>
       <div class="det-body">
         <table>
           <thead><tr><th style="width:260px">路由</th><th style="width:80px">方法</th><th>说明</th></tr></thead>
           <tbody>
             <tr><td><code>/api/chat</code></td><td><span class="tag get">GET</span></td><td>取 AI 对话历史</td></tr>
-            <tr><td><code>/api/chat</code></td><td><span class="tag post">POST</span></td><td>发送消息 → 守门人判定 → 可能放行节点</td></tr>
+            <tr><td><code>/api/chat</code></td><td><span class="tag post">POST</span></td><td>发送消息 → 守门人判定 → <b>任务去重</b> → 可能放行节点</td></tr>
             <tr><td><code>/api/chat</code></td><td><span class="tag del">DELETE</span></td><td>清空对话（换个项目重新开始）</td></tr>
+            <tr><td><code>/api/evidence-checklist</code></td><td><span class="tag get">GET</span></td><td><b>取证清单</b>：当前节点要交什么 / 已交什么 / 缺什么（<b>2026-11-04</b>）</td></tr>
             <tr><td><code>/api/nodes</code></td><td><span class="tag get">GET</span></td><td>5 节点放行状态视图</td></tr>
             <tr><td><code>/api/decisions</code></td><td><span class="tag get">GET</span> <span class="tag post">POST</span></td><td>承重决策读写</td></tr>
             <tr><td><code>/api/records</code></td><td><span class="tag get">GET</span> <span class="tag post">POST</span></td><td>记录卡读写</td></tr>
@@ -643,6 +662,7 @@
             <tr><td><code>archive-compose.ts</code></td><td>生成可迁移到豆包/DeepSeek 的提示词 + 完整交互文档</td><td><code>composeTransferPrompt()</code> / <code>composeTranscript()</code></td></tr>
             <tr><td><code>guards.ts</code></td><td>5 道反博弈闸门，应用层强制执行</td><td>退让上限 2、改写率阈值 0.3、抽检率 0.2、自提策略系数 1.2</td></tr>
             <tr><td><code>session.ts</code></td><td><b>学号鉴权</b>：签名 Cookie 签发/校验、按学号建档、每人独立文档；另保留演示用户常量供教师端用</td><td><code>createSessionToken()</code> / <code>verifySessionToken()</code> / <code>getSessionIds()</code> / <code>getOrCreateDocForUser()</code>；密钥存 <code>data/.session-secret</code></td></tr>
+            <tr><td><code>task-fingerprint.ts</code></td><td><b>任务指纹去重</b>：把 AI 派的取证任务拆成 人数/人群/地点/问题/交付物 五要素，加权比对，识别"又派了同一个任务"</td><td><code>buildFingerprint()</code> / <code>fingerprintSimilarity()</code> / <code>detectRepeatedTask()</code> / <code>buildAntiRepeatDirective()</code>；阈值 <code>TASK_REPEAT_THRESHOLD=0.68</code></td></tr>
           </tbody>
         </table>
         <ul>
@@ -766,6 +786,12 @@
     </div>
 
     <div class="gap" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
+      <h4 style="color:var(--ok)">取证体验　AI 反复派同一任务 + 学生不知道要交什么格式<span class="meta" style="color:var(--ok)">✅ 已修复 2026-11-04</span></h4>
+      <p><b>原症状：</b>线上真实 7 轮对话里，AI 连续 5 轮派出几乎一字不差的取证任务（"找3个10-15岁孩子家长，每人问4句…"），学生照做→被打回→再照做，形成死循环；学生实际已采访到真实家长（人数/年龄/报价/痛点/日期齐全），AI 却只回"没有3处用「」包住的原话"，学生无从下手。叠加硬闸门 <code>checkCustomerEvidenceGate</code> 只数引号不看来源，造成"网上抄4句→放行、真采访写成总结→卡住"的松紧倒挂，且跨轮累计可被凑数绕过。</p>
+      <div class="fix"><b>修法（已落地）：</b>① 判据表.md 每节点追加<b>「取证清单」</b>（学生填空格式 + AI 验收标准），由 <code>loader.ts</code> 运行时注入 prompt，与教师端量规页同源；<code>ai.ts</code> 增加两条硬规则——"任务不得重复"与"打回必须给填空模板"。② 新增 <code>src/lib/task-fingerprint.ts</code>：把任务拆成 人数/人群/地点/问题/交付物 五要素加权比对，命中（阈值 <code>TASK_REPEAT_THRESHOLD=0.68</code>）则带强制换任务指令重跑一次，并在回复里向学生明说换了什么；线上真实数据回放验证——真重复 71–77% 命中，换人群轮 22% 不误伤。③ <b>取消引号数量硬闸门</b>（<code>checkCustomerEvidenceGate</code> 函数保留未删，教师改一处调用即恢复），证据质量改由 AI 依据判据表判断，含"本地一手才算数"。④ 新增 <code>/api/evidence-checklist</code> + 学生端聊天页顶部可折叠<b>取证清单面板</b>（要交几项 / 已交啥 / 还差啥）。</div>
+    </div>
+
+    <div class="gap" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
       <h4 style="color:var(--ok)">P1-6　AI 429 限流 + 数据库无自动备份<span class="meta" style="color:var(--ok)">✅ 已修复 2026-11-02</span></h4>
       <p><b>原症状：</b>全班同时上课时 API 短时连续调用会 429，<code>callLLM()</code> 无退避重试，撞到限流直接返回一句「服务暂时不可用」；同时 <code>deploy.sh</code> 只在部署时手动备份，<code>data/harness.db</code> 平时完全裸奔。</p>
       <div class="fix"><b>修法（已落地）：</b>① <code>src/lib/ai.ts</code> 的 <code>request()</code> 改为<b>双层退避重试</b>——对 429/5xx 指数退避（1s→2s→4s + 抖动）+ 多把 key 轮换（<code>DASHSCOPE_API_KEY_BACKUP</code> 逗号分隔）；重试耗尽时区分「限流」与「真故障」给出可执行提示，不再让全班看到同一句无信息量报错。② 新增 <code>scripts/backup-db.sh</code>：用 sqlite3 <code>.backup</code> 做<b>一致性快照</b>（不是 cp —— WAL 模式下 cp 可能拷到损坏快照）+ 文件名带时间戳不覆盖 + 保留 30 天自动清理 + 每次 <code>integrity_check</code> 校验，损坏即报警；服务器 crontab <code>17 3 * * *</code> 每日 03:17 自动执行。</div>
@@ -773,7 +799,7 @@
 
     <div class="callout">
       <b>推进顺序与进度：</b>P0-3 鉴权 + P1-6 备份（保命与开门）→ P0-2 教师端接线（含 P1-5 口试）→ P1-4 AI 写 BP → P0-1 券产出。
-      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· 📋 需求基线已补（2026-11-04，用户故事 + 原型思路 + 交互流程）· ⏳ P0-2 教师端接线进行中。
+      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· 📋 需求基线已补（2026-11-04，用户故事 + 原型思路 + 交互流程）· ✅ 取证体验已修复（2026-11-04，取证清单 + 任务去重 + 取消引号硬闸门）· ⏳ P0-2 教师端接线进行中。
       <br/><b>需求基线新增结论：</b>经用户故事梳理，发现<b>教师端鉴权缺失</b>（middleware matcher 仅 <code>/student/:path*</code> + <code>/api/:path*</code>，教师端页面根本不经过检查）已排在 P0-2 之首——学生端数据已按学号隔离，但教师端目前对全班敞开。
     </div>
   </section>
@@ -786,12 +812,14 @@
     <table>
       <thead><tr><th style="width:170px">资产</th><th>内容 / 落点</th><th style="width:280px">出处依据</th></tr></thead>
       <tbody>
-        <tr><td>判据表.md</td><td>5 节点「合格判据 / 不合格反例 / 出处」，每节点 5 条反例；守门人按<strong>当前节点</strong>动态注入，命中反例时点名第几条（①②③④⑤）</td><td>精益画布 Maurya 2010；VPC Osterwalder 2014；国创赛 2025 职教赛道</td></tr>
+        <tr><td>判据表.md</td><td>5 节点「合格判据 / 不合格反例 / 出处」，每节点 5 条反例；守门人按<strong>当前节点</strong>动态注入，命中反例时点名第几条（①②③④⑤）；<strong>2026-11-04 起每节点追加「取证清单」</strong>——学生填空格式 + AI 验收标准，同源</td><td>精益画布 Maurya 2010；VPC Osterwalder 2014；国创赛 2025 职教赛道</td></tr>
         <tr><td>单位经济模型.md</td><td>客单价 × 频次 × 留存 → 毛利 → 减固定成本 → 盈亏平衡点；跑机 4 回合可真结算；含长沙体育新城示例</td><td>国创赛 2025 职教赛道：盈亏平衡点为财务必查项；管理会计边际贡献算法</td></tr>
         <tr><td>README.md</td><td>框架选型（<strong>精益画布</strong>为底线本、BMC 保留设计）、9 块↔5 节点映射、已知弱点</td><td>BMC = Osterwalder 2010；精益画布 = Maurya 2010</td></tr>
         <tr><td>loader.ts</td><td>运行时读取判据表/单位经济模型，按节点切分注入；带 mtime 缓存（改 .md 即生效）+ 内置兜底（文件缺失也不崩）</td><td>代码层，<code>src/lib/methodology/loader.ts</code></td></tr>
         <tr><td>用户故事与交互设计_20261104.md</td><td><strong>需求与设计基线</strong>：<strong>23 条</strong>用户故事（学生 12 · 教师 10 · 课程管理者 1），每条含 Given/When/Then 验收标准与状态标注（🟢已上线/🟡部分可用/🔴待建）；含信息架构、3 张关键页面线框、学生与教师双主线流程、13 条异常流程；🔴 待建 9 项已列依赖表（缺哪张表、哪个函数、哪个接口）</td><td>产品设计文档，<code>用户故事与交互设计_20261104.md</code></td></tr>
-        <tr><td>guards.ts（硬闸门）</td><td>顺序闸门 <code>checkSequenceGate</code>：只许放行「当前待推进节点」，越级解锁直接拦截；原话引用闸门 <code>checkCustomerEvidenceGate</code>：customer 放行前证据须含 ≥3 处引号包裹的访谈原话，不足自动打回</td><td>VPC「先客户档案后价值地图」顺序；判据表节点 1「痛点可查 ≥3 条原话引用」</td></tr>
+        <tr><td>guards.ts（硬闸门）</td><td>顺序闸门 <code>checkSequenceGate</code>：只许放行「当前待推进节点」，越级解锁直接拦截。<strong>原话引用闸门 <code>checkCustomerEvidenceGate</code> 已于 2026-11-04 停用</strong>（函数保留未删）：它只数引号个数不看来源，造成「网上抄 4 句→放行、真采访写成总结→卡住」的松紧倒挂，且跨轮累计可被凑数绕过；现由 AI 依据判据表（含「本地一手才算数」）判断质量</td><td>VPC「先客户档案后价值地图」顺序</td></tr>
+        <tr><td>task-fingerprint.ts（任务去重）</td><td><strong>2026-11-04 新增。</strong>把 AI 派的取证任务拆成 人数/人群/地点/问题/交付物 五要素，加权比对相似度；命中即带「必须换地点/人群/问法/交付物」的强制指令重跑一次，并在回复里向学生明说换了什么。阈值 <code>TASK_REPEAT_THRESHOLD=0.68</code></td><td>代码层 <code>src/lib/task-fingerprint.ts</code>；线上真实 7 轮对话实测：真重复 71–77% 命中，换人群轮 22% 不误伤</td></tr>
+        <tr><td>取证清单面板（学生端）</td><td><strong>2026-11-04 新增。</strong><code>/api/evidence-checklist</code> 返回当前节点要交哪几项、每项交成什么样、学生已交了什么（启发式关键词匹配）；学生端聊天页顶部可折叠展示。「疑似已交」仅作提示，最终以 AI 判定为准</td><td>代码层 <code>src/app/api/evidence-checklist/route.ts</code> + <code>src/app/student/chat/page.tsx</code></td></tr>
         <tr><td>教师端量规页（同源展示）</td><td><code>rubric/page.tsx</code> 改为 async 服务端组件，直接调用 <code>getMethodologyNodes()</code> 渲染 5 节点「合格判据 / 反例 / 出处」；与 AI 守门人读同一份判据表.md，页面标注「同源锁定」。教师评分锚点 = AI 拦的标准</td><td>代码层 <code>src/app/teacher/rubric/page.tsx</code> + loader.ts 导出</td></tr>
       </tbody>
     </table>
