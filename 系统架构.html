@@ -149,7 +149,7 @@
       <span class="chip">Drizzle ORM 0.45 + better-sqlite3 13</span>
       <span class="chip">阿里百炼 DashScope · deepseek-v4-pro</span>
       <span class="chip">版本 v0.1.0</span>
-      <span class="chip">文档版本 2026-11-02（学号鉴权+限流备份）</span>
+      <span class="chip">文档版本 2026-11-04（用户故事+交互设计）</span>
       <span class="chip">数据来源：源码实扫</span>
     </div>
   </div>
@@ -773,7 +773,8 @@
 
     <div class="callout">
       <b>推进顺序与进度：</b>P0-3 鉴权 + P1-6 备份（保命与开门）→ P0-2 教师端接线（含 P1-5 口试）→ P1-4 AI 写 BP → P0-1 券产出。
-      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· ⏳ P0-2 教师端接线进行中。
+      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· 📋 需求基线已补（2026-11-04，用户故事 + 原型思路 + 交互流程）· ⏳ P0-2 教师端接线进行中。
+      <br/><b>需求基线新增结论：</b>经用户故事梳理，发现<b>教师端鉴权缺失</b>（middleware matcher 仅 <code>/student/:path*</code> + <code>/api/:path*</code>，教师端页面根本不经过检查）已排在 P0-2 之首——学生端数据已按学号隔离，但教师端目前对全班敞开。
     </div>
   </section>
 
@@ -789,6 +790,7 @@
         <tr><td>单位经济模型.md</td><td>客单价 × 频次 × 留存 → 毛利 → 减固定成本 → 盈亏平衡点；跑机 4 回合可真结算；含长沙体育新城示例</td><td>国创赛 2025 职教赛道：盈亏平衡点为财务必查项；管理会计边际贡献算法</td></tr>
         <tr><td>README.md</td><td>框架选型（<strong>精益画布</strong>为底线本、BMC 保留设计）、9 块↔5 节点映射、已知弱点</td><td>BMC = Osterwalder 2010；精益画布 = Maurya 2010</td></tr>
         <tr><td>loader.ts</td><td>运行时读取判据表/单位经济模型，按节点切分注入；带 mtime 缓存（改 .md 即生效）+ 内置兜底（文件缺失也不崩）</td><td>代码层，<code>src/lib/methodology/loader.ts</code></td></tr>
+        <tr><td>用户故事与交互设计_20261104.md</td><td><strong>需求与设计基线</strong>：24 条用户故事（学生 12 · 教师 9 · 课程管理者 1），每条含 Given/When/Then 验收标准与状态标注（🟢已上线/🟡部分可用/🔴待建）；含信息架构、3 张关键页面线框、学生与教师双主线流程、13 条异常流程；🔴 待建 9 项已列依赖表（缺哪张表、哪个函数、哪个接口）</td><td>产品设计文档，<code>用户故事与交互设计_20261104.md</code></td></tr>
         <tr><td>guards.ts（硬闸门）</td><td>顺序闸门 <code>checkSequenceGate</code>：只许放行「当前待推进节点」，越级解锁直接拦截；原话引用闸门 <code>checkCustomerEvidenceGate</code>：customer 放行前证据须含 ≥3 处引号包裹的访谈原话，不足自动打回</td><td>VPC「先客户档案后价值地图」顺序；判据表节点 1「痛点可查 ≥3 条原话引用」</td></tr>
         <tr><td>教师端量规页（同源展示）</td><td><code>rubric/page.tsx</code> 改为 async 服务端组件，直接调用 <code>getMethodologyNodes()</code> 渲染 5 节点「合格判据 / 反例 / 出处」；与 AI 守门人读同一份判据表.md，页面标注「同源锁定」。教师评分锚点 = AI 拦的标准</td><td>代码层 <code>src/app/teacher/rubric/page.tsx</code> + loader.ts 导出</td></tr>
       </tbody>
