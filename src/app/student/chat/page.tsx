@@ -583,12 +583,12 @@ export default function ChatPage() {
           </div>
         )}
         <div className="mx-auto flex max-w-2xl items-end gap-2">
-          {/* 隐藏镜像：与 textarea 同宽同字体，用来测出内容的真实高度 */}
+          {/* 隐藏镜像：与 textarea 同宽同字体，用来测出内容的真实高度。
+              注意不能加 h-0 —— 那会把测量高度钉死为 0 */}
           <div
             ref={mirrorRef}
             aria-hidden="true"
-            className="pointer-events-none invisible absolute h-0 overflow-hidden whitespace-pre-wrap break-words px-4 py-3 text-sm leading-relaxed"
-            style={{ width: "100%" }}
+            className="pointer-events-none invisible absolute overflow-hidden whitespace-pre-wrap break-words px-4 py-3 text-sm leading-relaxed"
           />
           <textarea
             ref={inputRef}
