@@ -68,6 +68,82 @@ interface ChecklistData {
   turns: number;
 }
 
+/**
+ * 把 AI 正文里的 Markdown 粗体标记（**xx**）转成真粗体。
+ * 守门人照抄判据表原文时会带上 ** 号，直接纯文本渲染会出现字面星号。
+ */
+function renderBold(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((p, i) =>
+    p.startsWith("**") && p.endsWith("**") && p.length > 4 ? (
+      <strong key={i} className="font-semibold">
+        {p.slice(2, -2)}
+      </strong>
+    ) : (
+      <span key={i}>{p}</span>
+    )
+  );
+}
+
+/**
+ * 「依据」块渲染。
+ * 依据行格式：【依据：<框架>·<节点>｜<出处>｜<判据原文>】
+ * 第三段是判据表原文，必须原样显示给学生看——只给出处等于没给标准。
+ */
+function EvidenceBasis({ line }: { line: string }) {
+  const m = line.match(/【依据：([^】]*)】/);
+  const inner = m ? m[1] : line;
+  const segs = inner.split("｜").map((s) => s.trim());
+  const head = segs[0] ?? "";
+  const source = segs[1] ?? "";
+  const quote = segs.slice(2).join("｜");
+
+  return (
+    <div className="my-2 whitespace-normal rounded-lg border-l-[3px] border-blue-400 bg-blue-50/60 px-3 py-2 text-xs leading-relaxed">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+        <span className="font-semibold text-blue-800">依据</span>
+        <span className="text-blue-900">{head}</span>
+        {source && <span className="text-blue-700/80">｜{source}</span>}
+      </div>
+      {quote && (
+        <div className="mt-1 border-t border-blue-200/70 pt-1 text-neutral-700">
+          {renderBold(quote)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * AI 正文渲染：依据行独立成块，其余行按普通正文渲染（含粗体）。
+ * 按原始顺序逐行处理——依据行若出现在正文中间，也留在原位置，不提到顶部。
+ */
+function AssistantBody({ content }: { content: string }) {
+  const lines = content.split("\n");
+  const isBasis = (l: string) => l.trim().startsWith("【依据：");
+  const out: React.ReactNode[] = [];
+  let buf: string[] = [];
+
+  const flush = () => {
+    if (buf.length) {
+      out.push(<span key={`t${out.length}`}>{renderBold(buf.join("\n"))}</span>);
+      buf = [];
+    }
+  };
+
+  lines.forEach((l, i) => {
+    if (isBasis(l)) {
+      flush();
+      out.push(<EvidenceBasis key={`b${i}`} line={l} />);
+    } else {
+      buf.push(l);
+    }
+  });
+  flush();
+
+  return <>{out}</>;
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [nodes, setNodes] = useState<NodeState[]>([]);
@@ -79,6 +155,13 @@ export default function ChatPage() {
   const [flash, setFlash] = useState<string | null>(null);
   const [archiving, setArchiving] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  /** 输入框随内容增高（上限由 CSS max-h-48 控制，超出即内部滚动） */
+  function autoGrow(el: HTMLTextAreaElement) {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }
 
   const load = useCallback(async () => {
     const res = await fetch("/api/chat");
@@ -115,6 +198,8 @@ export default function ChatPage() {
     setInput("");
     setSending(true);
     setMsg("");
+    // 高度复位到最小值（发送后输入框回到 3 行）
+    if (inputRef.current) inputRef.current.style.height = "auto";
 
     setMessages((prev) => [
       ...prev,
@@ -423,7 +508,11 @@ export default function ChatPage() {
                         m.role === "user" ? "text-white" : "text-neutral-800"
                       }`}
                     >
-                      {m.content}
+                      {m.role === "assistant" ? (
+                        <AssistantBody content={m.content} />
+                      ) : (
+                        renderBold(m.content)
+                      )}
                     </div>
                     {m.role === "assistant" && !m.rated && (
                       <div className="mt-3 flex items-center gap-1 border-t border-neutral-100 pt-2">
@@ -474,30 +563,43 @@ export default function ChatPage() {
             {msg}
           </div>
         )}
-        <div className="mx-auto flex max-w-2xl gap-2">
-          <input
+        <div className="mx-auto flex max-w-2xl items-end gap-2">
+          <textarea
+            ref={inputRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
+            onChange={(e) => {
+              setInput(e.target.value);
+              autoGrow(e.target);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                send();
+              }
+            }}
+            rows={3}
             placeholder="汇报你查到的东西（越具体越好：谁说的、在哪看到的、原话是什么）"
-            className="flex-1 rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-blue-400 focus:outline-none"
+            className="max-h-48 min-h-[84px] flex-1 resize-none rounded-xl border border-neutral-200 px-4 py-3 text-sm leading-relaxed focus:border-blue-400 focus:outline-none"
             disabled={sending}
           />
           <button
             onClick={() => send()}
             disabled={sending || !input.trim()}
-            className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40"
+            className="h-[44px] shrink-0 rounded-xl bg-blue-600 px-6 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40"
           >
             {sending ? "…" : "发送"}
           </button>
           <button
             onClick={clearChat}
-            className="rounded-xl border border-neutral-200 px-3 py-3 text-xs text-neutral-500 hover:bg-neutral-50"
+            className="h-[44px] shrink-0 rounded-xl border border-neutral-200 px-3 text-xs text-neutral-500 hover:bg-neutral-50"
             title="清空对话"
           >
             清空
           </button>
         </div>
+        <p className="mx-auto mt-1.5 max-w-2xl text-right text-[11px] text-neutral-400">
+          Enter 发送 · Shift+Enter 换行
+        </p>
       </div>
     </div>
   );
