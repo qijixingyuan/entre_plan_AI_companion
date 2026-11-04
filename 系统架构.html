@@ -149,7 +149,7 @@
       <span class="chip">Drizzle ORM 0.45 + better-sqlite3 13</span>
       <span class="chip">阿里百炼 DashScope · deepseek-v4-pro</span>
       <span class="chip">版本 v0.1.0</span>
-      <span class="chip">文档版本 2026-11-04（取证清单+任务去重）</span>
+      <span class="chip">文档版本 2026-11-04（依据带原文）</span>
       <span class="chip">数据来源：源码实扫</span>
     </div>
   </div>
@@ -786,6 +786,12 @@
     </div>
 
     <div class="gap" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
+      <h4 style="color:var(--ok)">依据可追溯 + 输入框可用性　评价只给出处不给出原文 / 输入框放不下取证内容<span class="meta" style="color:var(--ok)">✅ 已修复 2026-11-04</span></h4>
+      <p><b>原症状：</b>① AI 评价时只写 <code>【依据：精益画布·目标客户｜Maurya 2010】</code>——只有出处、没有判据原文，学生看不到自己到底被哪一条标准判，出处对他毫无用处；② 学生端输入框是单行 <code>&lt;input&gt;</code>（约 44px 高），而学生要交的是"3 句原话 + 时间 + 地点 + 身份"，一行根本放不下。</p>
+      <div class="fix"><b>修法（已落地）：</b>① 依据行由两段扩为三段 <code>【依据：&lt;框架&gt;·&lt;节点&gt;｜&lt;出处&gt;｜&lt;判据原文&gt;】</code>，第三段强制照抄判据表里那一条的原文，"只写出处"在 prompt 里被明确判为不合格；学生端把依据行渲染成浅蓝引用块（判据原文单独一行、加粗部分真粗体），依据与正文按原顺序交错。② 输入框改 <code>&lt;textarea&gt;</code>，初始 3 行、随内容增高至 192px 上限，Enter 发送 / Shift+Enter 换行（兼容中文输入法），发送后复位。<b>踩坑记录</b>：textarea 的 <code>scrollHeight</code> 测不出内容真实高度（<code>rows</code> 属性使 <code>height:auto</code> 时 scrollHeight 恒等于 rows 行高，实测 1 行与 2 行均返回 91px），最终改用<b>同宽隐藏镜像 div</b> 测量，镜像宽度须用 JS 从 textarea 实时同步以保证换行点一致。</div>
+    </div>
+
+    <div class="gap" style="border-left-color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)">
       <h4 style="color:var(--ok)">取证体验　AI 反复派同一任务 + 学生不知道要交什么格式<span class="meta" style="color:var(--ok)">✅ 已修复 2026-11-04</span></h4>
       <p><b>原症状：</b>线上真实 7 轮对话里，AI 连续 5 轮派出几乎一字不差的取证任务（"找3个10-15岁孩子家长，每人问4句…"），学生照做→被打回→再照做，形成死循环；学生实际已采访到真实家长（人数/年龄/报价/痛点/日期齐全），AI 却只回"没有3处用「」包住的原话"，学生无从下手。叠加硬闸门 <code>checkCustomerEvidenceGate</code> 只数引号不看来源，造成"网上抄4句→放行、真采访写成总结→卡住"的松紧倒挂，且跨轮累计可被凑数绕过。</p>
       <div class="fix"><b>修法（已落地）：</b>① 判据表.md 每节点追加<b>「取证清单」</b>（学生填空格式 + AI 验收标准），由 <code>loader.ts</code> 运行时注入 prompt，与教师端量规页同源；<code>ai.ts</code> 增加两条硬规则——"任务不得重复"与"打回必须给填空模板"。② 新增 <code>src/lib/task-fingerprint.ts</code>：把任务拆成 人数/人群/地点/问题/交付物 五要素加权比对，命中（阈值 <code>TASK_REPEAT_THRESHOLD=0.68</code>）则带强制换任务指令重跑一次，并在回复里向学生明说换了什么；线上真实数据回放验证——真重复 71–77% 命中，换人群轮 22% 不误伤。③ <b>取消引号数量硬闸门</b>（<code>checkCustomerEvidenceGate</code> 函数保留未删，教师改一处调用即恢复），证据质量改由 AI 依据判据表判断，含"本地一手才算数"。④ 新增 <code>/api/evidence-checklist</code> + 学生端聊天页顶部可折叠<b>取证清单面板</b>（要交几项 / 已交啥 / 还差啥）。</div>
@@ -799,7 +805,7 @@
 
     <div class="callout">
       <b>推进顺序与进度：</b>P0-3 鉴权 + P1-6 备份（保命与开门）→ P0-2 教师端接线（含 P1-5 口试）→ P1-4 AI 写 BP → P0-1 券产出。
-      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· 📋 需求基线已补（2026-11-04，用户故事 + 原型思路 + 交互流程）· ✅ 取证体验已修复（2026-11-04，取证清单 + 任务去重 + 取消引号硬闸门）· ⏳ P0-2 教师端接线进行中。
+      <br/><b>已推进：</b>✅ P1-6 已修复（2026-11-02，限流退避 + 每日自动备份）· ✅ P0-3 已修复（2026-11-02，学号鉴权 + 每生独立文档）· 📋 需求基线已补（2026-11-04，用户故事 + 原型思路 + 交互流程）· ✅ 取证体验已修复（2026-11-04，取证清单 + 任务去重 + 取消引号硬闸门）· ✅ 依据与输入框已修复（2026-11-04，依据带判据原文 + 输入框多行自适应）· ⏳ P0-2 教师端接线进行中。
       <br/><b>需求基线新增结论：</b>经用户故事梳理，发现<b>教师端鉴权缺失</b>（middleware matcher 仅 <code>/student/:path*</code> + <code>/api/:path*</code>，教师端页面根本不经过检查）已排在 P0-2 之首——学生端数据已按学号隔离，但教师端目前对全班敞开。
     </div>
   </section>
@@ -819,6 +825,8 @@
         <tr><td>用户故事与交互设计_20261104.md</td><td><strong>需求与设计基线</strong>：<strong>23 条</strong>用户故事（学生 12 · 教师 10 · 课程管理者 1），每条含 Given/When/Then 验收标准与状态标注（🟢已上线/🟡部分可用/🔴待建）；含信息架构、3 张关键页面线框、学生与教师双主线流程、13 条异常流程；🔴 待建 9 项已列依赖表（缺哪张表、哪个函数、哪个接口）</td><td>产品设计文档，<code>用户故事与交互设计_20261104.md</code></td></tr>
         <tr><td>guards.ts（硬闸门）</td><td>顺序闸门 <code>checkSequenceGate</code>：只许放行「当前待推进节点」，越级解锁直接拦截。<strong>原话引用闸门 <code>checkCustomerEvidenceGate</code> 已于 2026-11-04 停用</strong>（函数保留未删）：它只数引号个数不看来源，造成「网上抄 4 句→放行、真采访写成总结→卡住」的松紧倒挂，且跨轮累计可被凑数绕过；现由 AI 依据判据表（含「本地一手才算数」）判断质量</td><td>VPC「先客户档案后价值地图」顺序</td></tr>
         <tr><td>task-fingerprint.ts（任务去重）</td><td><strong>2026-11-04 新增。</strong>把 AI 派的取证任务拆成 人数/人群/地点/问题/交付物 五要素，加权比对相似度；命中即带「必须换地点/人群/问法/交付物」的强制指令重跑一次，并在回复里向学生明说换了什么。阈值 <code>TASK_REPEAT_THRESHOLD=0.68</code></td><td>代码层 <code>src/lib/task-fingerprint.ts</code>；线上真实 7 轮对话实测：真重复 71–77% 命中，换人群轮 22% 不误伤</td></tr>
+        <tr><td>依据必须带判据原文</td><td><strong>2026-11-04 改造。</strong>AI 评价的依据行由两段扩为三段：<code>【依据：&lt;框架&gt;·&lt;节点&gt;｜&lt;出处&gt;｜&lt;判据原文&gt;】</code>——第三段强制照抄判据表里那一条的原文（合格判据第 N 条 / 不合格反例第 N 条），<b>只写出处视为不合格</b>。学生端把依据行渲染成浅蓝引用块（框架/节点/出处一行，判据原文另起一行），正文的 <code>**xx**</code> 转真粗体</td><td>prompt 规则在 <code>src/lib/ai.ts</code> SYSTEM_PROMPT「评价必须引用方法论母本」节；渲染在 <code>src/app/student/chat/page.tsx</code> 的 <code>EvidenceBasis</code> / <code>renderBold</code></td></tr>
+        <tr><td>输入框多行自适应</td><td><strong>2026-11-04 改造。</strong>学生端输入框由单行 <code>&lt;input&gt;</code> 改为 <code>&lt;textarea&gt;</code>：初始 3 行（84px），随内容增高，上限 192px 后内部滚动；Enter 发送、Shift+Enter 换行（兼容中文输入法 <code>isComposing</code>），发送后复位到下限。<b>实现要点</b>：textarea 的 <code>scrollHeight</code> 测不出真实内容高（<code>rows</code> 会让 <code>height:auto</code> 时恒等于 rows 行高，实测 1 行与 2 行都返回 91px），改用同宽隐藏镜像 div 测量，镜像宽度需用 JS 从 textarea 实时同步</td><td>代码层 <code>src/app/student/chat/page.tsx</code>（<code>autoGrow()</code> + <code>mirrorRef</code>，常量 <code>MIN_INPUT_H=84</code> / <code>MAX_INPUT_H=192</code>）</td></tr>
         <tr><td>取证清单面板（学生端）</td><td><strong>2026-11-04 新增。</strong><code>/api/evidence-checklist</code> 返回当前节点要交哪几项、每项交成什么样、学生已交了什么（启发式关键词匹配）；学生端聊天页顶部可折叠展示。「疑似已交」仅作提示，最终以 AI 判定为准</td><td>代码层 <code>src/app/api/evidence-checklist/route.ts</code> + <code>src/app/student/chat/page.tsx</code></td></tr>
         <tr><td>教师端量规页（同源展示）</td><td><code>rubric/page.tsx</code> 改为 async 服务端组件，直接调用 <code>getMethodologyNodes()</code> 渲染 5 节点「合格判据 / 反例 / 出处」；与 AI 守门人读同一份判据表.md，页面标注「同源锁定」。教师评分锚点 = AI 拦的标准</td><td>代码层 <code>src/app/teacher/rubric/page.tsx</code> + loader.ts 导出</td></tr>
       </tbody>
