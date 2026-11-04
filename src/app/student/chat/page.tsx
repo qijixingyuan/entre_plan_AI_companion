@@ -144,6 +144,10 @@ function AssistantBody({ content }: { content: string }) {
   return <>{out}</>;
 }
 
+/** 输入框高度上下限（px）——与 CSS min-h / max-h 保持一致 */
+const MIN_INPUT_H = 84;
+const MAX_INPUT_H = 192;
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [nodes, setNodes] = useState<NodeState[]>([]);
@@ -156,11 +160,26 @@ export default function ChatPage() {
   const [archiving, setArchiving] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const mirrorRef = useRef<HTMLDivElement>(null);
 
-  /** 输入框随内容增高（上限由 CSS max-h-48 控制，超出即内部滚动） */
+  /**
+   * 输入框随内容增高。
+   *
+   * ⚠️ 不能用 `el.scrollHeight` 测内容高度：textarea 的 `rows` 属性会让
+   * `height:auto` 时的 scrollHeight 恒等于 rows 行的高度（实测 1 行和 2 行都返回 91px），
+   * 永远测不出真实内容高度。改用同宽隐藏镜像元素测量。
+   */
   function autoGrow(el: HTMLTextAreaElement) {
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+    const mirror = mirrorRef.current;
+    if (!mirror) return;
+    // 镜像宽度必须与 textarea 完全一致，否则换行点不同、测出的高度会偏
+    mirror.style.width = `${el.getBoundingClientRect().width}px`;
+    mirror.textContent = el.value || "\u200b"; // 零宽空格：空内容也保底一行
+    const need = Math.max(
+      MIN_INPUT_H,
+      Math.min(MAX_INPUT_H, mirror.getBoundingClientRect().height)
+    );
+    el.style.height = `${need}px`;
   }
 
   const load = useCallback(async () => {
@@ -198,8 +217,8 @@ export default function ChatPage() {
     setInput("");
     setSending(true);
     setMsg("");
-    // 高度复位到最小值（发送后输入框回到 3 行）
-    if (inputRef.current) inputRef.current.style.height = "auto";
+    // 高度复位到下限（发送后输入框回到 3 行）
+    if (inputRef.current) inputRef.current.style.height = `${MIN_INPUT_H}px`;
 
     setMessages((prev) => [
       ...prev,
@@ -557,13 +576,20 @@ export default function ChatPage() {
       </div>
 
       {/* 输入区 */}
-      <div className="border-t border-neutral-200 bg-white px-8 py-4">
+      <div className="relative border-t border-neutral-200 bg-white px-8 py-4">
         {msg && (
           <div className="mx-auto mb-2 max-w-2xl rounded-lg bg-neutral-100 px-3 py-1.5 text-xs text-neutral-700">
             {msg}
           </div>
         )}
         <div className="mx-auto flex max-w-2xl items-end gap-2">
+          {/* 隐藏镜像：与 textarea 同宽同字体，用来测出内容的真实高度 */}
+          <div
+            ref={mirrorRef}
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute h-0 overflow-hidden whitespace-pre-wrap break-words px-4 py-3 text-sm leading-relaxed"
+            style={{ width: "100%" }}
+          />
           <textarea
             ref={inputRef}
             value={input}
@@ -577,10 +603,10 @@ export default function ChatPage() {
                 send();
               }
             }}
-            rows={3}
             placeholder="汇报你查到的东西（越具体越好：谁说的、在哪看到的、原话是什么）"
-            className="max-h-48 min-h-[84px] flex-1 resize-none rounded-xl border border-neutral-200 px-4 py-3 text-sm leading-relaxed focus:border-blue-400 focus:outline-none"
+            className="max-h-48 min-h-[84px] flex-1 resize-none overflow-y-auto rounded-xl border border-neutral-200 px-4 py-3 text-sm leading-relaxed focus:border-blue-400 focus:outline-none"
             disabled={sending}
+            style={{ height: MIN_INPUT_H }}
           />
           <button
             onClick={() => send()}
