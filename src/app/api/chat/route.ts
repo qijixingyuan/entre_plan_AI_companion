@@ -4,7 +4,8 @@ import { db, schema } from "@/db";
 import { eq, and } from "drizzle-orm";
 import { getSessionIds } from "@/lib/session";
 import { loadContext, DECISION_NODES, type DecisionNodeKey } from "@/lib/context";
-import { checkSequenceGate, checkCustomerEvidenceGate } from "@/lib/guards";
+import { checkSequenceGate } from "@/lib/guards";
+import { detectRepeatedTask, buildAntiRepeatDirective } from "@/lib/task-fingerprint";
 
 /** 只接受 5 个法定节点，防止模型输出脏 key 污染数据库 */
 function asNodeKey(v: string | undefined): DecisionNodeKey | null {
@@ -72,13 +73,39 @@ export async function POST(req: NextRequest) {
   const currentNode = DECISION_NODES.find(
     (n) => !ctx.decisions.some((d) => d.node === n.key)
   );
-  const raw = await callLLM(history, currentNode?.key ?? null);
-  const { body: replyBody, tag } = parseAITag(raw);
+
+  // ===== 任务去重（2026-11-04 用户反馈：AI 反复派同一个任务，学生被反复打回）=====
+  // 做法：先正常生成一次 → 把产出与该学生此前最近几轮的任务指纹比对 →
+  // 若判定为实质重复，则带着「上一轮派了什么、这次必须换什么」的硬指令重跑一次。
+  // 代价：仅在检测到重复时多一次模型调用（正常轮次零开销）。
+  const priorReplies = ctx.aiMessages
+    .filter((m) => m.role === "assistant")
+    .slice(-4)
+    .map((m) => m.content.replace(/^\s*\[\[[^\]]*\]\]\s*\n?/, ""));
+
+  let raw = await callLLM(history, currentNode?.key ?? null);
+  let { body: replyBody, tag } = parseAITag(raw);
+
+  if (priorReplies.length > 0) {
+    const repeat = detectRepeatedTask(replyBody, priorReplies);
+    if (repeat) {
+      const antiRepeat = buildAntiRepeatDirective({
+        score: repeat.score,
+        prevTask: repeat.prevTask,
+      });
+      raw = await callLLM(history, currentNode?.key ?? null, { antiRepeat });
+      const reparsed = parseAITag(raw);
+      replyBody = reparsed.body;
+      tag = reparsed.tag;
+    }
+  }
 
   // ===== 承重节点顺序硬闸门（VPC：先客户档案，后价值地图）=====
-  // 两道阀门均为确定性校验，不依赖 LLM 是否自觉：
-  //  1) 顺序闸门：只许放行「当前待推进节点」，越级直接拦截
-  //  2) 原话引用闸门：customer 放行前证据须含 ≥阈值 条现场访谈原话
+  // 顺序闸门是确定性校验，不依赖 LLM 是否自觉：只许放行「当前待推进节点」，越级直接拦截。
+  //
+  // 2026-11-04 起：**取消原话引用数量硬闸门**（原 checkCustomerEvidenceGate）。
+  // 原因：它只数引号个数、不看来源，导致「网上抄 4 句 → 放行、真采访写成总结 → 卡住」的松紧倒挂；
+  // 现在由 AI 依据判据表（含"本地一手才算数"）自行判断证据质量。
   const unlockKey = tag?.verdict === "pass" ? asNodeKey(tag.unlock) : null;
 
   let effectiveUnlock: DecisionNodeKey | null = unlockKey;
@@ -88,16 +115,6 @@ export async function POST(req: NextRequest) {
   if (!seq.allowed) {
     effectiveUnlock = null;
     gateNote = seq.detail ?? "顺序闸门：只能逐级放行，不能跳节点。";
-  } else if (effectiveUnlock === "customer") {
-    const custText = [
-      ...ctx.aiMessages.filter((m) => m.role === "user").map((m) => m.content),
-      studentText,
-    ].join("\n");
-    const ev = checkCustomerEvidenceGate(custText);
-    if (!ev.passed) {
-      effectiveUnlock = null;
-      gateNote = ev.detail ?? "原话引用不足，customer 暂不解锁。";
-    }
   }
 
   // 闸门拦截时，用系统硬闸门结论覆盖 AI 的「通过」判定（对话记录须真实）

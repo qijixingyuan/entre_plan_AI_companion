@@ -151,6 +151,40 @@ const TOTAL_DISCIPLINE = `# 守门人放行总纪律
 - 5 节点顺序：customer → value_prop → revenue → metric → moat，前一节点未走通不放开后一节点。
 - 所有事件库冲击（天气/政策/市场/经营）打在学生自己的承诺上，不是预设假数据（DEV-GUIDE §三）。`;
 
+/**
+ * 从节点段里抽出「取证清单」，转成给 AI 的硬指令块。
+ * 没有清单时返回空串（老母本或文件缺失，不阻塞）。
+ */
+function buildChecklistBlock(nodeKey: DecisionNodeKey, seg: string): string {
+  const lines = seg.split(/\r?\n/);
+  const items: ChecklistItem[] = [];
+  let inChecklist = false;
+  for (const line of lines) {
+    if (/^###\s+取证清单/.test(line)) {
+      inChecklist = true;
+      continue;
+    }
+    if (inChecklist && /^#{1,3}\s/.test(line)) break;
+    if (!inChecklist) continue;
+    const cm = line.match(/^\|\s*([①-⑩\d]+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*$/);
+    if (cm) items.push({ no: cm[1], what: cm[2].trim(), how: cm[3].trim() });
+  }
+  if (items.length === 0) return "";
+
+  const rows = items.map((it) => `${it.no} ${it.what} → ${it.how}`).join("\n");
+  return `# 本节点的「交作业格式」（打回时必须原样贴给学生）
+
+学生不知道该交成什么样，这是你的锅。你打回时**必须**把下面的空位原样给他，
+让他填空，而不是只说"没有原话""不够具体"这类他无法执行的批评。
+
+${rows}
+
+要求：
+- 先肯定他做对的部分（哪一条填了、内容对），再指出缺哪一条。
+- 把清单按"已交 / 还缺"分组写出来，已交的复述他实际写的内容，让他看见进展。
+- 缺的部分照抄上面的空位格式，让他照着填。`;
+}
+
 function fallbackForNode(key: DecisionNodeKey): string {
   const n = FALLBACK_NODES[key];
   const pass = n.pass.map((x, i) => `${i + 1}. ${x}`).join("\n");
@@ -200,7 +234,10 @@ export async function buildMethodologyInjection(opts: MethodologyInjectOpts): Pr
     if (md) {
       const map = splitCriteriaByNode(md);
       const seg = map[nodeKey];
-      if (seg) return `# 当前节点判据（评价与放行必须对照）\n${seg}\n\n${TOTAL_DISCIPLINE}`;
+      if (seg) {
+        const checklistBlock = buildChecklistBlock(nodeKey, seg);
+        return `# 当前节点判据（评价与放行必须对照）\n${seg}\n\n${checklistBlock}\n${TOTAL_DISCIPLINE}`;
+      }
     }
     return `# 当前节点判据（评价与放行必须对照）\n${fallbackForNode(nodeKey)}\n\n${TOTAL_DISCIPLINE}`;
   }
@@ -227,6 +264,17 @@ export interface MethodologyNode {
   fail: string[];
   /** 出处行数组 */
   source: string[];
+  /** 取证清单：学生照此填空、AI 照此验收（md 里的「### 取证清单」段表格） */
+  checklist: ChecklistItem[];
+  /** 取证清单的原文块（md 原样，供 AI 直接贴给学生） */
+  checklistRaw: string;
+}
+
+/** 取证清单的一行：# 要交什么 / 交成什么样 */
+export interface ChecklistItem {
+  no: string;
+  what: string;
+  how: string;
 }
 
 const NODE_ORDER: DecisionNodeKey[] = [
@@ -246,6 +294,8 @@ function parseNodeSegment(seg: string, fallbackKey: DecisionNodeKey, idx: number
   const pass: string[] = [];
   const fail: string[] = [];
   const source: string[] = [];
+  const checklist: ChecklistItem[] = [];
+  let checklistRaw = "";
 
   const lines = seg.split(/\r?\n/);
   const head = lines[0]?.match(/^##\s+节点\s+(\d+)\s+·\s+`([a-z_]+)`\s*(.+)?$/);
@@ -255,7 +305,7 @@ function parseNodeSegment(seg: string, fallbackKey: DecisionNodeKey, idx: number
     label = head[3]?.trim() || label;
   }
 
-  type Section = "none" | "pass" | "fail" | "source";
+  type Section = "none" | "pass" | "fail" | "source" | "checklist";
   let section: Section = "none";
 
   for (let i = 1; i < lines.length; i++) {
@@ -270,6 +320,11 @@ function parseNodeSegment(seg: string, fallbackKey: DecisionNodeKey, idx: number
     }
     if (/^###\s+出处/.test(line)) {
       section = "source";
+      continue;
+    }
+    if (/^###\s+取证清单/.test(line)) {
+      section = "checklist";
+      checklistRaw = "";
       continue;
     }
     if (/^#{1,3}\s/.test(line)) {
@@ -306,6 +361,13 @@ function parseNodeSegment(seg: string, fallbackKey: DecisionNodeKey, idx: number
         source.push(sm[1].trim());
         continue;
       }
+    } else if (section === "checklist") {
+      // 取证清单表格行： | ① | 要交什么 | 交成什么样 |
+      checklistRaw += line + "\n";
+      const cm = line.match(/^\|\s*([①-⑩\d]+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*$/);
+      if (cm) {
+        checklist.push({ no: cm[1], what: cm[2].trim(), how: cm[3].trim() });
+      }
     }
   }
 
@@ -314,7 +376,7 @@ function parseNodeSegment(seg: string, fallbackKey: DecisionNodeKey, idx: number
   if (fail.length === 0) fail.push(...FALLBACK_NODES[fallbackKey].fail);
   if (source.length === 0) source.push(FALLBACK_NODES[fallbackKey].source);
 
-  return { seq, key, label, correspond, pass, fail, source };
+  return { seq, key, label, correspond, pass, fail, source, checklist, checklistRaw };
 }
 
 /**
@@ -334,6 +396,8 @@ export async function getMethodologyNodes(): Promise<MethodologyNode[]> {
         pass: [...f.pass],
         fail: [...f.fail],
         source: [f.source],
+        checklist: [],
+        checklistRaw: "",
       };
     });
   }

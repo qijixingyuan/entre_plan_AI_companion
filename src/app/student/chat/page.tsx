@@ -41,9 +41,38 @@ interface NodeState {
   commitment: string | null;
 }
 
+/** 取证清单项（来自 /api/evidence-checklist，与 AI 守门人读同一份判据表） */
+interface ChecklistItemState {
+  no: string;
+  what: string;
+  how: string;
+  found: string[];
+  likelyDone: boolean;
+}
+
+interface ChecklistNode {
+  key: string;
+  label: string;
+  unlocked: boolean;
+  isCurrent: boolean;
+  items: ChecklistItemState[];
+}
+
+interface ChecklistData {
+  currentNodeKey: string | null;
+  currentNodeLabel: string | null;
+  nodes: ChecklistNode[];
+  quoteCount: number;
+  quoteNote: string;
+  recentTasks: { at: string; preview: string }[];
+  turns: number;
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [nodes, setNodes] = useState<NodeState[]>([]);
+  const [checklist, setChecklist] = useState<ChecklistData | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState("");
@@ -60,9 +89,21 @@ export default function ChatPage() {
     }
   }, []);
 
+  /** 取证清单单独拉，失败不阻塞对话 */
+  const loadChecklist = useCallback(async () => {
+    try {
+      const res = await fetch("/api/evidence-checklist");
+      const json = await res.json();
+      if (json.ok) setChecklist(json.data);
+    } catch {
+      /* 清单拉不到不影响对话 */
+    }
+  }, []);
+
   useEffect(() => {
     load();
-  }, [load]);
+    loadChecklist();
+  }, [load, loadChecklist]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,6 +141,7 @@ export default function ChatPage() {
       const d = json.data;
       setMessages((prev) => [...prev, d.assistantMessage]);
       if (d.nodes) setNodes(d.nodes);
+      loadChecklist();
       if (d.unlocked) {
         const node = (d.nodes ?? []).find((n: NodeState) => n.key === d.unlocked);
         setFlash(`🎯 承重节点「${node?.label ?? d.unlocked}」已放行 —— ${node?.commitment ?? ""}`);
@@ -231,6 +273,97 @@ export default function ChatPage() {
           </div>
         )}
       </div>
+
+      {/* 取证清单面板 —— 学生一眼看见"这节点要交什么、我交了啥、还差啥" */}
+      {checklist && checklist.currentNodeKey && (
+        <div className="border-b border-neutral-200 bg-neutral-50/60 px-8 py-2.5">
+          <button
+            onClick={() => setPanelOpen((v) => !v)}
+            className="flex w-full items-center gap-2 text-left"
+          >
+            <span className="text-sm font-medium text-neutral-800">
+              当前要交什么：{checklist.currentNodeLabel}
+            </span>
+            {(() => {
+              const cur = checklist.nodes.find((n) => n.isCurrent);
+              const done = cur ? cur.items.filter((i) => i.likelyDone).length : 0;
+              const total = cur ? cur.items.length : 0;
+              return (
+                <span className="rounded-full border border-neutral-300 bg-white px-2 py-0.5 text-[11px] text-neutral-600">
+                  疑似已交 {done}/{total} 项
+                </span>
+              );
+            })()}
+            <span className="text-[11px] text-neutral-500">
+              {panelOpen ? "收起 ▲" : "展开看清单和填法 ▼"}
+            </span>
+          </button>
+
+          {panelOpen && (
+            <div className="mt-2.5 space-y-3">
+              {checklist.nodes
+                .filter((n) => n.isCurrent || n.items.some((i) => i.likelyDone))
+                .map((n) => (
+                  <div key={n.key}>
+                    <div className="mb-1 text-[11px] font-medium text-neutral-600">
+                      {n.label}
+                      {n.unlocked ? "（已放行）" : n.isCurrent ? "（当前）" : ""}
+                    </div>
+                    <div className="space-y-1.5">
+                      {n.items.map((it) => (
+                        <div
+                          key={it.no}
+                          className={`rounded-lg border px-3 py-2 ${
+                            it.likelyDone
+                              ? "border-emerald-200 bg-emerald-50/60"
+                              : "border-amber-200 bg-amber-50/50"
+                          }`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span
+                              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] ${
+                                it.likelyDone
+                                  ? "bg-emerald-600 text-white"
+                                  : "bg-amber-600 text-white"
+                              }`}
+                            >
+                              {it.likelyDone ? "✓" : it.no}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-xs font-medium text-neutral-800">
+                                {it.what}
+                              </div>
+                              <div className="mt-0.5 text-[11px] leading-relaxed text-neutral-600">
+                                交成什么样：{it.how}
+                              </div>
+                              {it.found.length > 0 && (
+                                <div className="mt-1 space-y-0.5">
+                                  {it.found.map((f, i) => (
+                                    <div
+                                      key={i}
+                                      className="truncate text-[11px] text-emerald-700"
+                                      title={f}
+                                    >
+                                      你交过：{f}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              <p className="text-[11px] leading-relaxed text-neutral-500">
+                「疑似已交」是按关键词自动匹配的提示，不代表 AI 已认可；最终以 AI 学伴的判定为准。
+                你的引用数 {checklist.quoteCount} 条（仅参考，不作放行条件）。
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {flash && (
         <div className="mx-8 mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
